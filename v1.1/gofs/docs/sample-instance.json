@@ -1,0 +1,50 @@
+{
+    "graphs": [
+        {
+            "id": 1,
+            "time_start": 1371141113.559,
+            "duration": 300,
+            "nodes": [
+                {
+                    "id": 1,
+                    "license_number": "9PQR876"
+                },
+                {
+                    "id": 2,
+                    "license_number": "1ABC234"
+                }
+            ],
+            "edges": [
+                {
+                    "id": 1,
+                    "source": 1,
+                    "target": 2
+                }
+            ]
+        },
+		
+        {
+            "id": 2,
+            "time_start": 1371141500,
+            "duration": 200,
+            "nodes": [
+                {
+                    "id": 1,
+                    "license_number": "6XYZ957"
+                },
+                {
+                    "id": 2,
+                    "license_number": "3KLM875"
+                }
+            ],
+            "edges": [
+                {
+                    "id": 1,
+                    "source": 1,
+                    "target": 2,
+                    "speed": 63
+                }
+            ]
+        }
+    ]
+}

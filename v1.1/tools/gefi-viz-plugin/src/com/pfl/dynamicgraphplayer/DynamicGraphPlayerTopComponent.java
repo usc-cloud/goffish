@@ -1,0 +1,1233 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.pfl.dynamicgraphplayer;
+
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import org.gephi.graph.api.Graph;
+import org.gephi.graph.api.GraphController;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.gephi.project.api.ProjectController;
+import org.gephi.visualization.VizController;
+import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
+
+/**
+ * Top component which displays something.
+ */
+@ConvertAsProperties(
+    dtd = "-//com.pfl.dynamicgraphplayer//DynamicGraphPlayer//EN",
+autostore = false)
+@TopComponent.Description(
+    preferredID = "DynamicGraphPlayerTopComponent",
+//iconBase="SET/PATH/TO/ICON/HERE", 
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "filtersmode", openAtStartup = true)
+@ActionID(category = "Window", id = "com.pfl.dynamicgraphplayer.DynamicGraphPlayerTopComponent")
+@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.OpenActionRegistration(
+    displayName = "#CTL_DynamicGraphPlayerAction",
+preferredID = "DynamicGraphPlayerTopComponent")
+@Messages({
+    "CTL_DynamicGraphPlayerAction=DynamicGraphPlayer",
+    "CTL_DynamicGraphPlayerTopComponent=DynamicGraphPlayer Window",
+    "HINT_DynamicGraphPlayerTopComponent=This is a DynamicGraphPlayer window"
+})
+public final class DynamicGraphPlayerTopComponent extends TopComponent {
+
+    
+    GMLLoader loader;    // hash table containing graph data
+    AnimateBuildout animator;
+    AnimateBuildoutPropertyChangeListener animationListener;
+    private File _templateFile;
+    
+    
+    public DynamicGraphPlayerTopComponent() {
+        initComponents();
+        setName(Bundle.CTL_DynamicGraphPlayerTopComponent());
+        setToolTipText(Bundle.HINT_DynamicGraphPlayerTopComponent());
+        
+        // set up the animation listener.
+        animationListener = new AnimateBuildoutPropertyChangeListener();
+        animationListener.setDateLabel(this.lblCurrentDate);
+        animationListener.setDensityLabel(graphDensityLabel);
+        animationListener.setPromotedHistogram(histPromotedNodes);
+        animationListener.setValueHistogram(histValueFlow);
+        animationListener.setReentrantHistogram(histReentrantNodes);
+        animationListener.setDensityHistogram(this.histGraphDensity);
+        animationListener.setFirstDegreeTriangleHistogram(histFirstDegreeTriangles);
+        animationListener.setSldrProgress(dateSlider);
+    }
+
+    
+    
+     //////  LISTENERS AND CALL BACKS
+    
+    
+    
+
+    
+    public static class AnimatorStateListener{
+        
+        DynamicGraphPlayerTopComponent topWindow;
+        
+        public AnimatorStateListener(DynamicGraphPlayerTopComponent topWindow){
+            this.topWindow = topWindow;
+        }
+        
+        public void onError(final String message){
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                    public void run() {
+                        topWindow.reset(true);
+                        JOptionPane.showMessageDialog(topWindow, message);
+                    }
+                }); 
+        }
+  
+    }
+    
+    
+    
+    /**
+     *  Listener for FileLoader error or completion
+     */
+    public static class FileLoaderStateListener{
+        
+        DynamicGraphPlayerTopComponent topWindow;
+        
+        public FileLoaderStateListener(DynamicGraphPlayerTopComponent topWindow){
+            this.topWindow = topWindow;
+        }
+        
+        public void onError(final String message){
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(topWindow, message);
+                    }
+                }); 
+        }
+        
+        public void onSuccess(){
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                    public void run() {
+                         topWindow.playButton.setEnabled(true);
+                    }
+                }); 
+        }
+  
+    }
+
+    
+    
+    
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
+
+        templateChooser = new javax.swing.JFileChooser();
+        fileLoaderOptionsPanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        sourceTextField = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        seperatorTextField = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        targetTextField = new javax.swing.JTextField();
+        dateTextField = new javax.swing.JTextField();
+        ammountTextField = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        dateFormatField = new javax.swing.JTextField();
+        valueFieldCheckBox = new javax.swing.JCheckBox();
+        ignoreHeadersCheckBox = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        instanceChooser = new javax.swing.JFileChooser();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        histFirstDegreeTriangles = new com.pfl.dynamicgraphplayer.Histogram();
+        jLabel17 = new javax.swing.JLabel();
+        histValueFlow = new com.pfl.dynamicgraphplayer.Histogram();
+        jLabel19 = new javax.swing.JLabel();
+        histPromotedNodes = new com.pfl.dynamicgraphplayer.Histogram();
+        jLabel14 = new javax.swing.JLabel();
+        histReentrantNodes = new com.pfl.dynamicgraphplayer.Histogram();
+        jLabel18 = new javax.swing.JLabel();
+        histGraphDensity = new com.pfl.dynamicgraphplayer.Histogram();
+        dateSlider = new javax.swing.JSlider();
+        lblCurrentDate = new javax.swing.JLabel();
+        playBackSpeedSlider = new javax.swing.JSlider();
+        jLabel2 = new javax.swing.JLabel();
+        fileSelectButton = new javax.swing.JButton();
+        playButton = new javax.swing.JButton();
+        resetButton = new javax.swing.JButton();
+        graphDensityLabel = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        timeoutYearSpinner = new javax.swing.JSpinner();
+        timeoutWeekSpinner = new javax.swing.JSpinner();
+        timeoutDaySpinner = new javax.swing.JSpinner();
+        timeoutHourSpinner = new javax.swing.JSpinner();
+        timeoutMinuteSpinner = new javax.swing.JSpinner();
+        timeoutSecondSpinner = new javax.swing.JSpinner();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        tickLengthYearSpinner = new javax.swing.JSpinner();
+        tickLengthWeekSpinner = new javax.swing.JSpinner();
+        tickLengthDaySpinner = new javax.swing.JSpinner();
+        tickLengthHourSpinner = new javax.swing.JSpinner();
+        tickLengthMinuteSpinner = new javax.swing.JSpinner();
+        tickLengthSecondSpinner = new javax.swing.JSpinner();
+        instanceSelectButton = new javax.swing.JButton();
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, fileLoaderOptionsPanel, org.jdesktop.beansbinding.ObjectProperty.create(), templateChooser, org.jdesktop.beansbinding.BeanProperty.create("accessory"));
+        bindingGroup.addBinding(binding);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel4.text")); // NOI18N
+
+        sourceTextField.setText(org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.sourceTextField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel5.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel6.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel7.text")); // NOI18N
+
+        seperatorTextField.setText(org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.seperatorTextField.text")); // NOI18N
+        seperatorTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                seperatorTextFieldActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel8, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel8.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel9.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel10.text")); // NOI18N
+
+        targetTextField.setText(org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.targetTextField.text")); // NOI18N
+
+        dateTextField.setText(org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.dateTextField.text")); // NOI18N
+        dateTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dateTextFieldActionPerformed(evt);
+            }
+        });
+
+        ammountTextField.setText(org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.ammountTextField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel11.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel12.text")); // NOI18N
+
+        dateFormatField.setText(org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.dateFormatField.text")); // NOI18N
+
+        valueFieldCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(valueFieldCheckBox, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.valueFieldCheckBox.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(ignoreHeadersCheckBox, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.ignoreHeadersCheckBox.text")); // NOI18N
+
+        javax.swing.GroupLayout fileLoaderOptionsPanelLayout = new javax.swing.GroupLayout(fileLoaderOptionsPanel);
+        fileLoaderOptionsPanel.setLayout(fileLoaderOptionsPanelLayout);
+        fileLoaderOptionsPanelLayout.setHorizontalGroup(
+            fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, fileLoaderOptionsPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                        .addComponent(dateFormatField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                        .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addGap(18, 18, 18)
+                                .addComponent(seperatorTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(ignoreHeadersCheckBox)
+                            .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                            .addGap(5, 5, 5)
+                                            .addComponent(jLabel8))
+                                        .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                            .addGap(6, 6, 6)
+                                            .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jLabel9)
+                                                .addComponent(jLabel10))
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(valueFieldCheckBox)))
+                                    .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel5)
+                                            .addComponent(jLabel4))))
+                                .addGap(18, 18, 18)
+                                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(sourceTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                                        .addComponent(targetTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                                        .addComponent(dateTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(ammountTextField, javax.swing.GroupLayout.Alignment.LEADING))))
+                            .addComponent(jLabel11))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        fileLoaderOptionsPanelLayout.setVerticalGroup(
+            fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel11)
+                .addGap(5, 5, 5)
+                .addComponent(ignoreHeadersCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(seperatorTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(sourceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(targetTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                        .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel9)
+                            .addComponent(dateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ammountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(fileLoaderOptionsPanelLayout.createSequentialGroup()
+                                .addGap(11, 11, 11)
+                                .addComponent(jLabel10))))
+                    .addComponent(valueFieldCheckBox))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(fileLoaderOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(dateFormatField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(52, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jCheckBox1.text")); // NOI18N
+
+        instanceChooser.setMultiSelectionEnabled(true);
+
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane1.setHorizontalScrollBar(null);
+
+        jPanel2.setBackground(new java.awt.Color(204, 204, 204));
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel13.text")); // NOI18N
+
+        javax.swing.GroupLayout histFirstDegreeTrianglesLayout = new javax.swing.GroupLayout(histFirstDegreeTriangles);
+        histFirstDegreeTriangles.setLayout(histFirstDegreeTrianglesLayout);
+        histFirstDegreeTrianglesLayout.setHorizontalGroup(
+            histFirstDegreeTrianglesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        histFirstDegreeTrianglesLayout.setVerticalGroup(
+            histFirstDegreeTrianglesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel17, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel17.text")); // NOI18N
+
+        javax.swing.GroupLayout histValueFlowLayout = new javax.swing.GroupLayout(histValueFlow);
+        histValueFlow.setLayout(histValueFlowLayout);
+        histValueFlowLayout.setHorizontalGroup(
+            histValueFlowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        histValueFlowLayout.setVerticalGroup(
+            histValueFlowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel19, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel19.text")); // NOI18N
+
+        javax.swing.GroupLayout histPromotedNodesLayout = new javax.swing.GroupLayout(histPromotedNodes);
+        histPromotedNodes.setLayout(histPromotedNodesLayout);
+        histPromotedNodesLayout.setHorizontalGroup(
+            histPromotedNodesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        histPromotedNodesLayout.setVerticalGroup(
+            histPromotedNodesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel14, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel14.text")); // NOI18N
+
+        javax.swing.GroupLayout histReentrantNodesLayout = new javax.swing.GroupLayout(histReentrantNodes);
+        histReentrantNodes.setLayout(histReentrantNodesLayout);
+        histReentrantNodesLayout.setHorizontalGroup(
+            histReentrantNodesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        histReentrantNodesLayout.setVerticalGroup(
+            histReentrantNodesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel18, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel18.text")); // NOI18N
+
+        javax.swing.GroupLayout histGraphDensityLayout = new javax.swing.GroupLayout(histGraphDensity);
+        histGraphDensity.setLayout(histGraphDensityLayout);
+        histGraphDensityLayout.setHorizontalGroup(
+            histGraphDensityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 320, Short.MAX_VALUE)
+        );
+        histGraphDensityLayout.setVerticalGroup(
+            histGraphDensityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        dateSlider.setBackground(new java.awt.Color(204, 204, 204));
+        dateSlider.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                dateSliderMouseDragged(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(lblCurrentDate, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.lblCurrentDate.text")); // NOI18N
+
+        playBackSpeedSlider.setBackground(new java.awt.Color(204, 204, 204));
+        playBackSpeedSlider.setMajorTickSpacing(100);
+        playBackSpeedSlider.setMaximum(1000);
+        playBackSpeedSlider.setMinimum(50);
+        playBackSpeedSlider.setMinorTickSpacing(50);
+        playBackSpeedSlider.setPaintLabels(true);
+        playBackSpeedSlider.setPaintTicks(true);
+        playBackSpeedSlider.setSnapToTicks(true);
+        playBackSpeedSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                playBackSpeedSliderStateChanged(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel2.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(fileSelectButton, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.fileSelectButton.text")); // NOI18N
+        fileSelectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fileSelectButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(playButton, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.playButton.text")); // NOI18N
+        playButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                playButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.resetButton.text")); // NOI18N
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(graphDensityLabel, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.graphDensityLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel15, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel15.text")); // NOI18N
+
+        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel16, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel16.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel20, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel20.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel21, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel21.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel22, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel22.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel23, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel23.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel24, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel24.text")); // NOI18N
+
+        timeoutYearSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        timeoutYearSpinner.setOpaque(false);
+        timeoutYearSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                timeoutYearSpinnerStateChanged(evt);
+            }
+        });
+
+        timeoutWeekSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(0), null, Integer.valueOf(1)));
+        timeoutWeekSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                timeoutWeekSpinnerStateChanged(evt);
+            }
+        });
+
+        timeoutDaySpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        timeoutDaySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                timeoutDaySpinnerStateChanged(evt);
+            }
+        });
+
+        timeoutHourSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        timeoutHourSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                timeoutHourSpinnerStateChanged(evt);
+            }
+        });
+
+        timeoutMinuteSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        timeoutMinuteSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                timeoutMinuteSpinnerStateChanged(evt);
+            }
+        });
+
+        timeoutSecondSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        timeoutSecondSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                timeoutSecondSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel3.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel25, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel25.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel26, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel26.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel27, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel27.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel28, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel28.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel29, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel29.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel30, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.jLabel30.text")); // NOI18N
+
+        tickLengthYearSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        tickLengthYearSpinner.setOpaque(false);
+        tickLengthYearSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tickLengthYearSpinnerStateChanged(evt);
+            }
+        });
+
+        tickLengthWeekSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        tickLengthWeekSpinner.setOpaque(false);
+        tickLengthWeekSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tickLengthWeekSpinnerStateChanged(evt);
+            }
+        });
+
+        tickLengthDaySpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        tickLengthDaySpinner.setName(""); // NOI18N
+        tickLengthDaySpinner.setOpaque(false);
+        tickLengthDaySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tickLengthDaySpinnerStateChanged(evt);
+            }
+        });
+
+        tickLengthHourSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        tickLengthHourSpinner.setOpaque(false);
+        tickLengthHourSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tickLengthHourSpinnerStateChanged(evt);
+            }
+        });
+
+        tickLengthMinuteSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        tickLengthMinuteSpinner.setOpaque(false);
+        tickLengthMinuteSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tickLengthMinuteSpinnerStateChanged(evt);
+            }
+        });
+
+        tickLengthSecondSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(0), null, Integer.valueOf(1)));
+        tickLengthSecondSpinner.setOpaque(false);
+        tickLengthSecondSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tickLengthSecondSpinnerStateChanged(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(instanceSelectButton, org.openide.util.NbBundle.getMessage(DynamicGraphPlayerTopComponent.class, "DynamicGraphPlayerTopComponent.instanceSelectButton.text")); // NOI18N
+        instanceSelectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                instanceSelectButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(fileSelectButton)
+                        .addGap(9, 9, 9)
+                        .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel17)
+                                    .addComponent(jLabel13)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel18)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(graphDensityLabel))
+                                    .addComponent(playBackSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 332, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel19)
+                                    .addComponent(jLabel14)
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(histGraphDensity, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(histReentrantNodes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(histPromotedNodes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(histValueFlow, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(histFirstDegreeTriangles, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(lblCurrentDate)
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(dateSlider, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                    .addComponent(timeoutYearSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(timeoutWeekSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                    .addComponent(jLabel26)
+                                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                                        .addComponent(jLabel15)
+                                                        .addGap(33, 33, 33)
+                                                        .addComponent(jLabel20)))
+                                                .addComponent(jLabel25))
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                    .addComponent(timeoutDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(timeoutHourSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(timeoutMinuteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                                                    .addComponent(timeoutSecondSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                            .addComponent(jLabel27)
+                                                            .addGap(39, 39, 39)
+                                                            .addComponent(jLabel28))
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                            .addComponent(jLabel21)
+                                                            .addGap(39, 39, 39)
+                                                            .addComponent(jLabel22)))
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                            .addComponent(jLabel23)
+                                                            .addGap(18, 18, 18)
+                                                            .addComponent(jLabel24))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                                            .addComponent(jLabel29)
+                                                            .addGap(18, 18, 18)
+                                                            .addComponent(jLabel30)))
+                                                    .addGap(12, 12, 12))))))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(tickLengthYearSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tickLengthWeekSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tickLengthDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tickLengthHourSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tickLengthMinuteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                                .addComponent(tickLengthSecondSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(15, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel16)
+                            .addComponent(jLabel3)))
+                    .addComponent(instanceSelectButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fileSelectButton)
+                    .addComponent(playButton)
+                    .addComponent(resetButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(instanceSelectButton)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(playBackSpeedSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addGap(1, 1, 1)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jLabel26)
+                    .addComponent(jLabel27)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabel29)
+                    .addComponent(jLabel30))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tickLengthYearSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tickLengthWeekSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tickLengthDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tickLengthHourSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tickLengthMinuteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tickLengthSecondSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel16)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(jLabel20)
+                    .addComponent(jLabel21)
+                    .addComponent(jLabel22)
+                    .addComponent(jLabel23)
+                    .addComponent(jLabel24))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(timeoutYearSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(timeoutDaySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(timeoutWeekSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(timeoutHourSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(timeoutMinuteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(timeoutSecondSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblCurrentDate)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dateSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(histFirstDegreeTriangles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel17)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(histValueFlow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel19)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(histPromotedNodes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(histReentrantNodes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel18)
+                    .addComponent(graphDensityLabel))
+                .addGap(18, 18, 18)
+                .addComponent(histGraphDensity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(38, Short.MAX_VALUE))
+        );
+
+        jScrollPane1.setViewportView(jPanel2);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 958, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        bindingGroup.bind();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void seperatorTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seperatorTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_seperatorTextFieldActionPerformed
+
+    private void dateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_dateTextFieldActionPerformed
+
+    private void instanceSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_instanceSelectButtonActionPerformed
+        reset(true);
+        playButton.setEnabled(false);
+        loader = null;
+        int returnVal = instanceChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File[] files = instanceChooser.getSelectedFiles();
+            if (files != null) {
+
+                FileLoaderStateListener listener = new FileLoaderStateListener(this);
+
+                SimpleDateFormat dateFormat;
+                try{
+                    dateFormat = new SimpleDateFormat(dateFormatField.getText());
+                }
+                catch(IllegalArgumentException e){
+                    listener.onError("Invalid Date format entered.");
+                    return;
+                }
+                try {
+                    InputStream templateStream = new FileInputStream(_templateFile);
+
+                    ArrayList<Path> paths = new ArrayList<>(files.length);
+                    for (File p : files) {
+                        paths.add(Paths.get(p.getPath()));
+                    }
+
+                    loader = new GMLLoader(templateStream, paths, dateFormat);
+                    loader.setStateListener(listener);
+                    new Thread(loader).start();
+                } catch (FileNotFoundException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+
+        }
+    }//GEN-LAST:event_instanceSelectButtonActionPerformed
+
+    private void tickLengthSecondSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tickLengthSecondSpinnerStateChanged
+        tickLengthStateChanged();
+    }//GEN-LAST:event_tickLengthSecondSpinnerStateChanged
+
+    private void tickLengthMinuteSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tickLengthMinuteSpinnerStateChanged
+        tickLengthStateChanged();
+    }//GEN-LAST:event_tickLengthMinuteSpinnerStateChanged
+
+    private void tickLengthHourSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tickLengthHourSpinnerStateChanged
+        tickLengthStateChanged();
+    }//GEN-LAST:event_tickLengthHourSpinnerStateChanged
+
+    private void tickLengthDaySpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tickLengthDaySpinnerStateChanged
+        tickLengthStateChanged();
+    }//GEN-LAST:event_tickLengthDaySpinnerStateChanged
+
+    private void tickLengthWeekSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tickLengthWeekSpinnerStateChanged
+        tickLengthStateChanged();
+    }//GEN-LAST:event_tickLengthWeekSpinnerStateChanged
+
+    private void tickLengthYearSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tickLengthYearSpinnerStateChanged
+        tickLengthStateChanged();
+    }//GEN-LAST:event_tickLengthYearSpinnerStateChanged
+
+    private void timeoutSecondSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_timeoutSecondSpinnerStateChanged
+        timeoutWindowStateChanged();
+    }//GEN-LAST:event_timeoutSecondSpinnerStateChanged
+
+    private void timeoutMinuteSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_timeoutMinuteSpinnerStateChanged
+        timeoutWindowStateChanged();
+    }//GEN-LAST:event_timeoutMinuteSpinnerStateChanged
+
+    private void timeoutHourSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_timeoutHourSpinnerStateChanged
+        timeoutWindowStateChanged();
+    }//GEN-LAST:event_timeoutHourSpinnerStateChanged
+
+    private void timeoutDaySpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_timeoutDaySpinnerStateChanged
+        timeoutWindowStateChanged();
+    }//GEN-LAST:event_timeoutDaySpinnerStateChanged
+
+    private void timeoutWeekSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_timeoutWeekSpinnerStateChanged
+        timeoutWindowStateChanged();
+    }//GEN-LAST:event_timeoutWeekSpinnerStateChanged
+
+    private void timeoutYearSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_timeoutYearSpinnerStateChanged
+        timeoutWindowStateChanged();
+    }//GEN-LAST:event_timeoutYearSpinnerStateChanged
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        reset(true);
+    }//GEN-LAST:event_resetButtonActionPerformed
+
+    private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
+        tooglePlayPause();
+    }//GEN-LAST:event_playButtonActionPerformed
+
+    private void fileSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileSelectButtonActionPerformed
+        reset(true);
+        playButton.setEnabled(false);
+        loader = null;
+        int returnVal = templateChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = templateChooser.getSelectedFile();
+            if (file != null) {
+                _templateFile = file;
+            }
+        }
+    }//GEN-LAST:event_fileSelectButtonActionPerformed
+
+    private void playBackSpeedSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_playBackSpeedSliderStateChanged
+        if (animator != null)
+        {
+            animator.setDelay(playBackSpeedSlider.getValue());
+        }
+    }//GEN-LAST:event_playBackSpeedSliderStateChanged
+
+    private void dateSliderMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dateSliderMouseDragged
+        if(animator != null && !animator.isRunning()){
+            reset(false);
+            Long minDate = animator.getDate();
+            long numdays = dateSlider.getValue();
+
+            Long pauseDate = (minDate + numdays*(long)(1000*60*60*24));
+            animator.setPauseDate(pauseDate);
+            DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH);
+            lblCurrentDate.setText(dateFormatter.format(pauseDate));
+        }
+    }//GEN-LAST:event_dateSliderMouseDragged
+
+    
+    private void tickLengthStateChanged(){
+        int seconds = (Integer) this.tickLengthYearSpinner.getValue() *365 *24 * 3600;
+        seconds += (Integer) tickLengthWeekSpinner.getValue()  * 7 * 24 * 3600;
+        seconds += (Integer) tickLengthDaySpinner.getValue()  * 24 * 3600;
+        seconds += (Integer) tickLengthHourSpinner.getValue()  * 3600;
+        seconds += (Integer) tickLengthMinuteSpinner.getValue()  * 60;
+        seconds += (Integer) tickLengthSecondSpinner.getValue();
+        setTickLength(seconds);
+    }
+    
+    private void timeoutWindowStateChanged(){
+        long seconds = (Integer) this.timeoutYearSpinner.getValue() *1L *365 *24 * 3600;
+        seconds += (Integer) timeoutWeekSpinner.getValue() * 1L * 7 * 24 * 3600;
+        seconds += (Integer) timeoutDaySpinner.getValue() * 1L * 24 * 3600;
+        seconds += (Integer) timeoutHourSpinner.getValue() *1L * 3600;
+        seconds += (Integer) timeoutMinuteSpinner.getValue() *1L * 60;
+        seconds += (Integer) timeoutSecondSpinner.getValue();
+        setWindowLength(seconds);
+    }
+    
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField ammountTextField;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JTextField dateFormatField;
+    private javax.swing.JSlider dateSlider;
+    private javax.swing.JTextField dateTextField;
+    private javax.swing.JPanel fileLoaderOptionsPanel;
+    private javax.swing.JButton fileSelectButton;
+    private javax.swing.JLabel graphDensityLabel;
+    private com.pfl.dynamicgraphplayer.Histogram histFirstDegreeTriangles;
+    private com.pfl.dynamicgraphplayer.Histogram histGraphDensity;
+    private com.pfl.dynamicgraphplayer.Histogram histPromotedNodes;
+    private com.pfl.dynamicgraphplayer.Histogram histReentrantNodes;
+    private com.pfl.dynamicgraphplayer.Histogram histValueFlow;
+    private javax.swing.JCheckBox ignoreHeadersCheckBox;
+    private javax.swing.JFileChooser instanceChooser;
+    private javax.swing.JButton instanceSelectButton;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCurrentDate;
+    private javax.swing.JSlider playBackSpeedSlider;
+    private javax.swing.JButton playButton;
+    private javax.swing.JButton resetButton;
+    private javax.swing.JTextField seperatorTextField;
+    private javax.swing.JTextField sourceTextField;
+    private javax.swing.JTextField targetTextField;
+    private javax.swing.JFileChooser templateChooser;
+    private javax.swing.JSpinner tickLengthDaySpinner;
+    private javax.swing.JSpinner tickLengthHourSpinner;
+    private javax.swing.JSpinner tickLengthMinuteSpinner;
+    private javax.swing.JSpinner tickLengthSecondSpinner;
+    private javax.swing.JSpinner tickLengthWeekSpinner;
+    private javax.swing.JSpinner tickLengthYearSpinner;
+    private javax.swing.JSpinner timeoutDaySpinner;
+    private javax.swing.JSpinner timeoutHourSpinner;
+    private javax.swing.JSpinner timeoutMinuteSpinner;
+    private javax.swing.JSpinner timeoutSecondSpinner;
+    private javax.swing.JSpinner timeoutWeekSpinner;
+    private javax.swing.JSpinner timeoutYearSpinner;
+    private javax.swing.JCheckBox valueFieldCheckBox;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
+    // End of variables declaration//GEN-END:variables
+    @Override
+    public void componentOpened() {
+        // TODO add custom code on component opening
+    }
+
+    @Override
+    public void componentClosed() {
+        // TODO add custom code on component closing
+    }
+
+    void writeProperties(java.util.Properties p) {
+        // better to version settings since initial version as advocated at
+        // http://wiki.apidesign.org/wiki/PropertyFiles
+        p.setProperty("version", "1.0");
+        // TODO store your settings
+    }
+
+    void readProperties(java.util.Properties p) {
+        String version = p.getProperty("version");
+        // TODO read your settings according to their version
+    }
+    
+    
+    
+    
+    //////////////// PRIVATE METHODS
+    
+    
+    /**
+     * Start or stop the animation
+     */
+    private synchronized void tooglePlayPause(){
+         if (loader == null) {
+            return;
+        }
+
+        playButton.setEnabled(false);
+        
+        // create new animator if needed
+        if (animator == null){
+            
+            // setup histograms
+            histFirstDegreeTriangles.setBand(true);
+            histFirstDegreeTriangles.setColor(new Color(255, 170, 12));
+            histValueFlow.setBand(true);
+            histValueFlow.setColor(new Color(81,188,71));
+            
+            animator = new AnimateBuildout(loader, 1000);
+            animator.addAnimationChangeListener(animationListener);
+            animator.setStateListener(new AnimatorStateListener(this));
+            animator.setDelay(playBackSpeedSlider.getValue());
+            
+            // set the timeout window and tick length
+            timeoutWindowStateChanged();
+            tickLengthStateChanged();
+        }
+        
+        if (!animator.isRunning()){
+            
+            new Thread(animator).start();
+            playButton.setText("Pause");
+             
+            
+             
+        }
+        else{
+            haultAnimation();
+            playButton.setText("Play");
+        }
+        
+       playButton.setEnabled(true);
+    }
+    
+    
+    
+    private void setHistogramWindows(int days)
+    {
+        histFirstDegreeTriangles.setAgeOut(days);
+        histValueFlow.setAgeOut(days);
+        histGraphDensity.setAgeOut(days);
+        histPromotedNodes.setAgeOut(days);
+        histReentrantNodes.setAgeOut(days);
+    }
+    
+    
+    /**
+     * Adjust the window length.
+     * weeks must be > 0 or command is ignored 
+     * @param weeks 
+     */
+    private void setWindowLength(long seconds)
+    {
+        if (seconds > 0 && animator !=null){
+           animator.TIMEOUT_LENGTH = 1000*seconds;  
+           
+           // TODO WARNING, histograms are set at days, they should be updated
+           // to seconds.
+           setHistogramWindows( (int) (seconds/24/3600));
+        }     
+    }
+    
+    
+        /**
+     * Adjust the tick length.
+     * weeks must be > 0 or command is ignored 
+     * @param weeks 
+     */
+    private void setTickLength(int seconds)
+    {
+        if (seconds > 0 && animator !=null){
+           animator.TICK_LENGTH = seconds;
+        }     
+    }
+    
+    
+    /**
+     * Clear the graph and create a new project if there isn't one.
+     * @param resetall if true also stop and clear the animation.
+     */
+    private synchronized void reset(boolean resetall){
+        if(resetall)
+        {
+            if (animator != null){
+                animator.cancel();
+                animator = null;
+            }
+            lblCurrentDate.setText("");
+            playButton.setText("Play");
+        }
+        
+      
+        ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
+        if(pc.getCurrentProject() == null)
+        {
+            pc.newProject();
+        }
+       
+        // clear the graph
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getModel();
+        if(graphModel != null)
+        {
+            Graph grph;
+            grph = graphModel.getGraph();
+            grph.clear();
+        }
+        
+        histFirstDegreeTriangles.clear();
+        histValueFlow.clear();
+        histGraphDensity.setBand(false);
+        histGraphDensity.clear();
+        histPromotedNodes.setBand(false);
+        histPromotedNodes.clear();
+        histReentrantNodes.setBand(false);
+        histReentrantNodes.clear();
+        
+       
+    }
+    
+    
+    /**
+     * Stop the animation thread
+     */
+    private synchronized void haultAnimation() {
+        if (animator != null) {
+            animator.cancel();
+        }
+    }
+
+    
+
+    
+    
+}

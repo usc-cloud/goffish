@@ -1,0 +1,69 @@
+{
+    "graphs": [
+        {
+            "directed": true,
+            "node_properties": [
+                {
+                    "label": {
+                        "is_static": true,
+                        "type": "string"
+                    }
+                },
+                {
+                    "license_number": {
+                        "is_static": false,
+                        "type": "string"
+                    }
+                }
+            ],
+            "edge_properties": [
+                {
+                    "label": {
+                        "is_static": true,
+                        "type": "string"
+                    }
+                },
+                {
+                    "distance_miles": {
+                        "is_static": true,
+                        "type": "double"
+                    }
+                },
+                {
+                    "lanes": {
+                        "is_static": false,
+                        "type": "int"
+                    }
+                },
+                {
+                    "speed": {
+                        "is_static": false,
+                        "type": "int"
+                    }
+                }
+            ],
+            
+			"nodes": [
+                {
+                    "id": 1,
+                    "label": "los angeles"
+                },
+                {
+                    "id": 2,
+                    "label": "bakesfield"
+                }
+            ],
+			
+            "edges": [
+                {
+                    "id": 1,
+                    "source": 1,
+                    "target": 2,
+                    "label": "Interstate 5",
+                    "distance_miles": 83.6,
+                    "lanes": 2,
+                }
+            ]
+        }
+    ]
+}

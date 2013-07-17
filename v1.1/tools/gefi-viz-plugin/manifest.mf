@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: com.pfl.dynamicgraphplayer
+OpenIDE-Module-Localizing-Bundle: com/pfl/dynamicgraphplayer/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Specification-Version: 1.0
+

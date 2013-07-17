@@ -1,0 +1,51 @@
+FLOE:
+=====
+Revision: 5790
+Author: cwickram
+Date: Tuesday, July 16, 2013 7:11:26 AM
+Message:
+Gopher related fixes
+----
+Modified : /code/smartgrid/floe/trunk/framework/modules/distribution/coordinator/src/main/assembly/bin.xml
+Modified : /code/smartgrid/floe/trunk/framework/modules/distribution/coordinator/src/main/bin/coordinator.sh
+Deleted : /code/smartgrid/floe/trunk/framework/modules/distribution/coordinator/src/main/conf/coodinator.properties
+Added : /code/smartgrid/floe/trunk/framework/modules/distribution/coordinator/src/main/conf/coordinator.properties (Copy from path: /code/smartgrid/floe/trunk/framework/modules/distribution/coordinator/src/main/conf/coodinator.properties, Revision, 5756)
+Modified : /code/smartgrid/floe/trunk/framework/modules/distribution/manager/src/main/assembly/bin.xml
+Modified : /code/smartgrid/floe/trunk/framework/modules/distribution/manager/src/main/bin/manager.sh
+Modified : /code/smartgrid/floe/trunk/framework/modules/distribution/manager/src/main/conf/Manager.properties
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/healthmanager/LocalHealthEventListener.java
+Deleted : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/ContainerEnvironment.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/ContainerImpl.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/FlakeImpl.java
+Added : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/FloeRuntimeEnvironment.java (Copy from path: /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/ContainerEnvironment.java, Revision, 5747)
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/pelletRunners/SingleInSingleOutPelletRunner.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/queues/BSPSinkQueue.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/queues/SourceQueue.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/impl/rest/container/ContainerRestHandler.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/startup/Container.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/startup/Coordinator.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/startup/Manager.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/util/Constants.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/util/ContainerMonitor.java
+Modified : /code/smartgrid/floe/trunk/framework/modules/floe-core/src/main/java/edu/usc/pgroup/floe/util/NetworkUtil.java
+
+Gopher:
+======
+Revision: 5799
+Author: cwickram
+Date: Wednesday, July 17, 2013 7:54:15 AM
+Message:
+small bug faced while testing CC.
+----
+Modified : /code/cloud/goffish/gopher/samples/connected-components/src/main/java/edu/usc/goffish/gopher/sample/ConnectedComponents.java
+
+GoFS
+====
+Revision: 5778
+Author: simmhan
+Date: Sunday, July 14, 2013 1:39:16 PM
+Message:
+changed to inlude additional supported types.
+----
+Modified : /code/cloud/goffish/gofs/code/GoFS/docs/README.JSON.txt
+

@@ -1,0 +1,134 @@
+<FloeGraph>
+    <Nodes>
+        <!-- Genaric node-->
+        <Node>
+            <!--Required Elements-->
+            <nodeId>1</nodeId>
+            <pelletType>edu.usc.goffish.gopher.impl.BSPProcessorPellet</pelletType>
+            <Resource>
+                <numberOfCores>1</numberOfCores>
+            </Resource>
+            <InPorts>
+                <Port>
+                    <portName>in</portName>
+                </Port>
+            </InPorts>
+            <OutputPorts>
+                <Port>
+                    <portName>3</portName>
+                </Port>
+
+                <Port>
+                    <portName>CONTROL</portName>
+                </Port>
+            </OutputPorts>
+        </Node>
+
+
+        <Node>
+            <!--Required Elements-->
+            <nodeId>5</nodeId>
+                <pelletType>edu.usc.goffish.gopher.impl.ControlPellet</pelletType>
+            <Resource>
+                <numberOfCores>1</numberOfCores>
+            </Resource>
+            <InPorts>
+                <Port>
+                    <portName>in</portName>
+                </Port>
+            </InPorts>
+            <OutputPorts>
+                <Port>
+                    <portName>out</portName>
+                </Port>
+            </OutputPorts>
+        </Node>
+
+        <Node>
+            <!--Required Elements-->
+            <nodeId>6</nodeId>
+            <pelletType>edu.usc.goffish.gopher.impl.FWDPellet</pelletType>
+            <Resource>
+                <numberOfCores>1</numberOfCores>
+            </Resource>
+            <InPorts>
+                <Port>
+                    <portName>in</portName>
+                </Port>
+            </InPorts>
+            <OutputPorts>
+                <Port>
+                    <portName>out</portName>
+                </Port>
+            </OutputPorts>
+        </Node>
+
+    </Nodes>
+
+
+    <Edges>
+
+        <!--FWD to Pellet Wiring -->
+        <Edge>
+            <source>
+                <nodeId>6</nodeId>
+                <port>out</port>
+            </source>
+            <sink>
+                <nodeId>1</nodeId>
+                <port>in</port>
+            </sink>
+            <channelBehaviourType>Push</channelBehaviourType>
+            <channelTransportType>Socket</channelTransportType>
+        </Edge>
+
+        <!--Control to Pellet Wiring -->
+        <Edge>
+            <source>
+                <nodeId>5</nodeId>
+                <port>out</port>
+            </source>
+            <sink>
+                <nodeId>1</nodeId>
+                <port>in</port>
+            </sink>
+            <channelBehaviourType>Push</channelBehaviourType>
+            <channelTransportType>Socket</channelTransportType>
+        </Edge>
+
+
+
+        <!--Processor self connections-->
+
+        <Edge>
+            <source>
+                <nodeId>1</nodeId>
+                <port>3</port>
+            </source>
+            <sink>
+                <nodeId>1</nodeId>
+                <port>in</port>
+            </sink>
+            <channelBehaviourType>Push</channelBehaviourType>
+            <channelTransportType>Socket</channelTransportType>
+        </Edge>
+
+
+        <!--To Control connections -->
+
+        <Edge>
+            <source>
+                <nodeId>1</nodeId>
+                <port>CONTROL</port>
+            </source>
+            <sink>
+                <nodeId>5</nodeId>
+                <port>in</port>
+            </sink>
+            <channelBehaviourType>Push</channelBehaviourType>
+            <channelTransportType>Socket</channelTransportType>
+        </Edge>
+
+
+    </Edges>
+</FloeGraph>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="GoFS_AR">
+    <output-path>$PROJECT_DIR$/out/artifacts/GoFS_AR</output-path>
+    <root id="archive" name="GoFS_AR.jar">
+      <element id="module-output" name="ARAdjMat" />
+    </root>
+  </artifact>
+</component>

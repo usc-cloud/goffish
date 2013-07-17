@@ -1,0 +1,35 @@
+Changes in v 1.1
+GoFS
+=====
+1. Performance improvements
+2. API Changes (breaking change)
+3. JSON from and to GML
+4. Bug fix: Kryo serialization
+
+
+Gopher
+======
+1. Additional Applications
+2. Bug Fix: port to new GoFS Apis
+
+Floe
+====
+1. Bug fixes for weighted round robin data dispersion scneraio.
+
+****************************
+Changes in v1.0
+
+GoFS
+----
+1. Refactored code to appropriate packages.
+2. Kryo Bug fixes 
+3. Rest NameNode Implementation
+
+
+Gopher
+-----
+1. added new sample application - license plate detection algorithm in timeseries graph of transport network.
+
+Utilities
+----------
+1. added a sample data generator to generate a graph template and random (as well as application specific) graph instances in GML format based on a given topology.
