@@ -1,0 +1,65 @@
+****************************
+Changes in v2.0RC1
+****************************
+GoFS
+=====
+1. Performance improvements - Slice Binning
+2. Rest NameNode service
+3. Globally unique subgraph ids
+4. New API: Mapping from remote vertex to subgraph id
+5. Improvements to deployment tools
+
+
+Gopher
+======
+1. Iterative BSP
+2. Subgraph centric messaging
+3. Improvements to deployment tools
+4. Better BSP work flow design 
+5. Support to run mutiple applications on same deployment.
+ 
+Floe
+====
+1. Gopher Resource Manager Plugin
+2. Imprioved NetworkUtil which enable it to run in cluster with mutiple network interfaces. 
+
+
+****************************
+Changes in v 1.1
+****************************
+GoFS
+=====
+1. Performance improvements
+2. API Changes (breaking change)
+3. JSON from and to GML
+4. Bug fix: Kryo serialization
+
+
+Gopher
+======
+1. Additional Applications
+2. Bug Fix: port to new GoFS Apis
+
+Floe
+====
+1. Bug fixes for weighted round robin data dispersion scneraio.
+
+
+****************************
+Changes in v1.0
+****************************
+GoFS
+----
+1. Refactored code to appropriate packages.
+2. Kryo Bug fixes 
+3. Rest NameNode Implementation
+
+
+Gopher
+-----
+1. added new sample application - license plate detection algorithm in timeseries graph of transport network.
+
+Utilities
+----------
+1. added a sample data generator to generate a graph template and random (as well as application specific) graph instances in GML format based on a given topology.
+
