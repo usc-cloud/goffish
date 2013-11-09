@@ -1,0 +1,4 @@
+#!/bin/sh
+BASEDIR=$(dirname $0)
+OPTS="-cp ${BASEDIR}/gofs-api.jar:${BASEDIR}/gofs-core.jar:${BASEDIR}/lib/*"
+${JAVA_HOME}/bin/java $OPTS edu.usc.goffish.gofs.tools.GoFSNameNodeServer "$@"
