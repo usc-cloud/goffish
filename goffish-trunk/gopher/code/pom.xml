@@ -1,0 +1,117 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+ <parent>
+		<groupId>edu.usc</groupId>
+		<artifactId>goffish</artifactId>
+		<version>2.0</version>
+		<relativePath>../../pom.xml</relativePath>
+    </parent>
+<groupId>edu.usc.goffish</groupId>
+  <artifactId>gopher</artifactId>
+  <version>2.0</version>
+    <packaging>pom</packaging>
+
+
+  <name>Gopher</name>
+  <url>http://maven.apache.org</url>
+
+
+    
+	<profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <attach>true</attach>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <activation>
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
+        </profile>       
+    </profiles>
+	
+	
+  <dependencyManagement>
+        <dependencies>
+           <dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.11</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+                <groupId>edu.usc.goffish.gopher</groupId>
+                <artifactId>gopher-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.usc.goffish.gopher</groupId>
+                <artifactId>gopher-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    
+    <repositories>
+        <repository>
+        	<id>MavenCentral</id>
+        	<name>Maven repository</name>
+        	<url>http://repo1.maven.org/maven2</url>
+        	<releases>
+        		<enabled>true</enabled>
+        	</releases>
+        	<snapshots>
+        		<enabled>false</enabled>
+        	</snapshots>
+        </repository>
+
+        <repository>
+        	<id>Codehaus Snapshots</id>
+        	<url>http://snapshots.repository.codehaus.org/</url>
+        	<snapshots>
+        		<enabled>true</enabled>
+        	</snapshots>
+        	<releases>
+        		<enabled>false</enabled>
+        	</releases>
+        </repository>
+    </repositories>
+
+    <modules>
+       <!-- Include the new modules -->
+	   <module>modules/api</module>
+	    <module>modules/core</module>
+	    <module>modules/deployment/server</module>
+	    <module>modules/deployment/client</module>
+    </modules>
+
+    <properties>
+        <!-- Sets the source encoding to UTF-8 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Maven Tools -->
+        <maven.version>3.0.4</maven.version>
+    </properties>
+
+    <developers>
+        <!-- If you are a committer and your name is not listed here, please include/edit -->
+    </developers>
+</project>

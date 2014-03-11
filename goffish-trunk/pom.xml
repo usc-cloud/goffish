@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.usc</groupId>
+    <artifactId>goffish</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0</version>
+    <name>Goffish</name>
+    <description>GoFFish
+    </description>
+    <url>http://ganges.usc.edu/wiki/GoFFish</url>
+
+    <!--Moved the modules out of default profile  and disabled all the profiles-->
+   
+    <profiles>
+	<profile>
+	  <id>default</id>
+	  <activation>
+		<activeByDefault>true</activeByDefault>
+	  </activation>
+	    <modules>
+		<module>gofs/code</module>
+		<module>gopher/code</module>
+		<module>gopher/samples</module>
+                <module>tools</module>
+             </modules>
+	</profile>
+    </profiles>
+</project>
+
