@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="90">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>community-main.cpp</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/community.cpp</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/community.h</itemPath>
+      <itemPath>converter.cpp</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph.cpp</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph.h</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph_binary.cpp</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph_binary.h</itemPath>
+      <itemPath>/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/main_hierarchy.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>GNU_MPI|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+      </compileType>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/community.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/community.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph_binary.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph_binary.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/main_hierarchy.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="community-main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="converter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>GNU_MPI|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/community.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/community.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph_binary.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/graph_binary.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/media/sf_E_DRIVE/phd-svn/goffish/community-detection-mpi/Louvain-MPI/main_hierarchy.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="community-main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="converter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
