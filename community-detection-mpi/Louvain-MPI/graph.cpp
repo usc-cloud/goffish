@@ -58,12 +58,12 @@ Graph::Graph (vector<pair<int,int> > edgeList) {
      
     
     int nb_links = edgeList.size();
-    
+    double w=1.; 
     for(int i=0; i < edgeList.size();i++) {
         int src = edgeList[i].first;
         int dest = edgeList[i].second;
         
-        links[src].push_back(dest,1);
+        links[src].push_back(make_pair(dest,w));
     }
     
 }

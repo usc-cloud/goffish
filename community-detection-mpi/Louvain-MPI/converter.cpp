@@ -3,6 +3,8 @@
  */
 
 #include "graph.h"
+#include <string.h>
+#include <sstream>
 
 using namespace std;
 
@@ -66,7 +68,7 @@ parse_args(int argc, char **argv) {
  * This will have the remote edges and associated partition number
  */
 int main(int argc, char** argv) {
-
+   parse_args(argc, argv);
     
   ifstream finput;
   finput.open(infile,fstream::in);
@@ -166,14 +168,18 @@ int main(int argc, char** argv) {
        
        for(int i =0; i< numberOfPartitions; i++) {
            ofstream fremoteList;
-       
-           char* remoteEdgeListName = outfile + "_" + i + ".remote";
-           fremoteList.open(remoteEdgeListName,fstream::out);
-           
+           string s(outfile);
+           stringstream ss;
+           ss << i;
+           string remoteName = s + "_" + ss.str() + ".remote";
+            char *cstr = new char[remoteName.length() + 1];
+            strcpy(cstr, remoteName.c_str());
+           fremoteList.open(cstr,fstream::out);
+           delete [] cstr;
            for(int j=0; j< remoteEdges[i].size(); j++) {
                int source = remoteEdges[i][j].first;
                int sink = remoteEdges[i][j].second;               
-               fremoteList << source << " " << oldToNewMap[sink].first + "," + oldToNewMap[sink].first  << endl; 
+               fremoteList << source << " " << oldToNewMap[sink].first << "," << oldToNewMap[sink].first  << endl; 
            }
            
            fremoteList.close();
@@ -184,8 +190,15 @@ int main(int argc, char** argv) {
                
                Graph g(partitions[i]);
                g.clean(UNWEIGHTED);
-               char* out = outfile + "_" + i + ".bin";
-               g.display_binary(outfile,NULL,UNWEIGHTED);
+               string s(outfile);
+               stringstream ss;
+               ss << i;
+               string sout = s + "_" + ss.str() + ".bin";
+               char *cstr = new char[sout.length() + 1];
+                strcpy(cstr, sout.c_str());
+                
+               g.display_binary(cstr,NULL,UNWEIGHTED);
+               delete [] cstr;
            }
        }
        
