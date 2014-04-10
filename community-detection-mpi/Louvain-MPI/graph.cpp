@@ -62,7 +62,9 @@ Graph::Graph (vector<pair<int,int> > edgeList) {
     for(int i=0; i < edgeList.size();i++) {
         int src = edgeList[i].first;
         int dest = edgeList[i].second;
-        
+        if (links.size()<=max(src,dest)+1) {
+                links.resize(max(src,dest)+1);
+        }
         links[src].push_back(make_pair(dest,w));
     }
     
