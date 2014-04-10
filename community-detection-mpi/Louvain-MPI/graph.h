@@ -38,6 +38,8 @@ class Graph {
   
   Graph (char *filename, int type);
   
+  Graph (vector<pair<int,int> > edgeList);
+  
   void clean(int type);
   void renumber(int type);
   void display(int type);

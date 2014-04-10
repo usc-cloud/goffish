@@ -50,6 +50,24 @@ Graph::Graph(char *filename, int type) {
   finput.close();
 }
 
+/**
+ * Take edge list as a input to create a graph
+ * @param edgeList undirected edgelist (i.e. for each a->b there exist a b->a unless a==b)
+ */
+Graph::Graph (vector<pair<int,int> > edgeList) {
+     
+    
+    int nb_links = edgeList.size();
+    
+    for(int i=0; i < edgeList.size();i++) {
+        int src = edgeList[i].first;
+        int dest = edgeList[i].second;
+        
+        links[src].push_back(dest,1);
+    }
+    
+}
+
 void
 Graph::renumber(int type) {
   vector<int> linked(links.size(),-1);
