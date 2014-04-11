@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
         for (int j = 0; j < remoteEdges[i].size(); j++) {
             int source = remoteEdges[i][j].first;
             int sink = remoteEdges[i][j].second;
-            fremoteList << oldToNewMap[source-1].first << " " << oldToNewMap[sink-1].first << "," << oldToNewMap[sink-1].second << endl;
+            fremoteList << (oldToNewMap[source-1].first -1) << " " << (oldToNewMap[sink-1].first - 1) << "," << ( oldToNewMap[sink-1].second - 1)<< endl;
         }
 
         fremoteList.close();
@@ -243,7 +243,7 @@ int main(int argc, char** argv) {
         cout << "Partition " << i << " remote done" << endl;
 
       //  for (int j = 0; j < partitions[i].size(); j++) {
-            printPartition(partitions[i],i);
+            //printPartition(partitions[i],i);
             Graph g(partitions[i]);
             g.clean(UNWEIGHTED);
             string st(outfile);
@@ -252,7 +252,9 @@ int main(int argc, char** argv) {
             string sout = st + "_" + sst.str() + ".bin";
             cstr = new char[sout.length() + 1];
             strcpy(cstr, sout.c_str());
-
+                
+            cout << "********* Partition " << i << " ********************" <<endl;
+            g.display(UNWEIGHTED);
             g.display_binary(cstr, NULL, UNWEIGHTED);
             delete [] cstr;
       //  }
