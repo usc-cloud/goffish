@@ -1,4 +1,4 @@
-/**
+/*-/**
  * Some of the code was copied from https://sites.google.com/site/findcommunities/
  */
 
@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
         for (int j = 0; j < remoteEdges[i].size(); j++) {
             int source = remoteEdges[i][j].first;
             int sink = remoteEdges[i][j].second;
-            fremoteList << (oldToNewMap[source-1].first -1) << " " << (oldToNewMap[sink-1].first - 1) << "," << ( oldToNewMap[sink-1].second - 1)<< endl;
+            fremoteList << (oldToNewMap[source-1].first -1) << " " << (oldToNewMap[sink-1].first - 1) << "," << ( oldToNewMap[sink-1].second)<< endl;
         }
 
         fremoteList.close();

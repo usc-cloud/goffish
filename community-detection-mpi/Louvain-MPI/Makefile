@@ -1,17 +1,18 @@
 #!/bin/bash
 
 CC=g++
+MPI=mpic++
 CFLAGS= -ansi -O5 -Wall
 LDFLAGS= -ansi -lm -Wall
 #EXEC=community converter hierarchy
-EXEC=convert
-OBJ1= graph_binary.o
+EXEC=community convert
+OBJ1= graph_binary.o community.o
 OBJ2= 	graph.o
 
 all: $(EXEC)
 
-#community : $(OBJ1) main_community.o
-#	$(CC) -fopenmp -o $@ $^ $(LDFLAGS)
+community : $(OBJ1) community-main.o
+	$(MPI) -fopenmp -o $@ $^ $(LDFLAGS)
 
 convert : $(OBJ2) converter.o
 	$(CC) -fopenmp -o $@ $^ $(LDFLAGS)
@@ -24,10 +25,10 @@ convert : $(OBJ2) converter.o
 ##########################################
 
 %.o: %.cpp %.h
-	$(CC) -fopenmp -o $@ -c $< $(CFLAGS)
+	$(MPI) -fopenmp -o $@ -c $< $(CFLAGS)
 
 %.o: %.cpp
-	$(CC) -fopenmp -o $@ -c $< $(CFLAGS)
+	$(MPI) -fopenmp -o $@ -c $< $(CFLAGS)
 
 clean:
 	rm -f *.o *~ $(EXEC)

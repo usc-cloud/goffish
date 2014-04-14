@@ -23,7 +23,7 @@ using namespace std;
 
 char *filename = NULL;
 char *remoteEdgesFile=NULL;
-char *remoteEdgesFile = NULL;
+//char *remoteEdgesFile = NULL;
 char *filename_part = NULL;
 int type       = UNWEIGHTED;
 int nb_pass    = 0;
@@ -117,10 +117,24 @@ int main(int argc, char** argv) {
     
     parse_args(argc, argv);
     
+    stringstream rankS;
+    rankS << rank;
+    
+    string s(filename);
+    s += "_" + rankS.str() + ".bin";
+    
+    string r(remoteEdgesFile);
+    r += "_" + rankS.str() + ".remote";
+    
+    vector<pair<int,int>> remoteMap;
+    
+    
+    
     if (verbose)
         display_time("Begin");   
-    
-     Community c(filename, NULL, type, -1, precision);
+    char* tmp = new char[s.length() + 1];
+     strcpy(tmp, remoteName.c_str());
+     Community c(tmp, NULL, type, -1, precision);
         if (filename_part!=NULL)
                  c.init_partition(filename_part);
         Graph g;
