@@ -8,7 +8,8 @@
 #include <cstdlib>
 #include <stdlib.h>
 #include <math.h>
-#include <string>
+#include <string.h>
+#include <stdio.h>
 #include <iostream> 
 #include <fstream>
 #include <sstream>
@@ -33,6 +34,14 @@ int k1 = 16;
 
 bool verbose = false;
 
+vector< pair<int,int> > remoteMap(10,make_pair(-1, -1));
+
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
 
 void
 usage(char *prog_name, const char *more) {
@@ -126,14 +135,34 @@ int main(int argc, char** argv) {
     string r(remoteEdgesFile);
     r += "_" + rankS.str() + ".remote";
     
-    vector<pair<int,int>> remoteMap;
+    vector<pair<int,int> > remoteMap;
     
+    ifstream remoteFileStream(r);
     
+    for(string line;getline( remoteFileStream,line);) {
+        vector<string> parts = split(line,' ');
+        string localV = parts[0];
+        string mapping= parts[1];
+        int source = atoi(localV);
+        
+        vector<string> mappingParts = split(mapping,',');
+        
+        int sink = atoi(mapping[0]);
+        int partition = atoi(mapping[1]);
+        
+        
+        if(remoteMap.size() <= source) {s        
+            remoteMap.resize(source + 1, make_pair(-1,-1));
+        
+        }
+        
+        remoteMap[source] = make_pair(sink,partition);               
+    }
     
     if (verbose)
         display_time("Begin");   
-    char* tmp = new char[s.length() + 1];
-     strcpy(tmp, remoteName.c_str());
+     char* tmp = new char[s.length() + 1];
+     strcpy(tmp, s.c_str());
      Community c(tmp, NULL, type, -1, precision);
         if (filename_part!=NULL)
                  c.init_partition(filename_part);
