@@ -1,4 +1,4 @@
-// File: graph_binary.cpp
+                // File: graph_binary.cpp
 // -- graph handling source
 //-----------------------------------------------------------------------------
 // Community detection 
