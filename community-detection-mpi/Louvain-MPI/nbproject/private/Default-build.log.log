@@ -1,6 +1,0 @@
-mpic++ -fopenmp -o graph_binary.o -c graph_binary.cpp -ansi -O5 -Wall
-mpic++ -fopenmp -o community.o -c community.cpp -ansi -O5 -Wall
-community.cpp:205:102: error: no ‘Graph Community::partition2graph_binary_map(std::vector<std::pair<int, int> >, std::vector<std::pair<int, int> >)’ member function declared in class ‘Community’
- Graph Community::partition2graph_binary_map(vector<pair<int,int> > map, vector<pair<int,int> > newMap) {
-                                                                                                      ^
-make: *** [community.o] Error 1
