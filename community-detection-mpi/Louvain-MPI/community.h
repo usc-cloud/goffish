@@ -40,6 +40,8 @@ class Community {
   vector<int> n2c; // community to which each node belongs
   vector<double> in,tot; // used to compute the modularity participation of each community
 
+  vector<int> n2c_new;
+  
   // number of pass for one level computation
   // if -1, compute as many pass as needed to increase modularity
   int nb_pass;
@@ -93,6 +95,8 @@ class Community {
 
   // generates the binary graph of communities as computed by one_level
   Graph partition2graph_binary();
+  
+  Graph partition2graph_binary_map(vector<pair<int,int> > map, vector<pair<int,int> > newMap);
 
   // compute communities of the graph for one level
   // return true if some nodes have been moved

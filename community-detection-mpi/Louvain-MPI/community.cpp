@@ -14,6 +14,10 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
+#include <vector>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "community.h"
 
 using namespace std;
@@ -202,64 +206,6 @@ Community::display_partition() {
     cout << i << " " << renumber[n2c[i]] << endl;
 }
 
-Graph Community::partition2graph_binary_map(vector<pair<int,int> > map, vector<pair<int,int> > newMap) {
-
- // Renumber communities
-  vector<int> renumber(size, -1);
-  for (int node=0 ; node<size ; node++) {
-    renumber[n2c[node]]++;
-  }
-
-  int final=0;
-  for (int i=0 ; i<size ; i++)
-    if (renumber[i]!=-1)
-      renumber[i]=final++;
-
-  // Compute communities
-  vector<vector<int> > comm_nodes(final);
-  for (int node=0 ; node<size ; node++) {
-    comm_nodes[renumber[n2c[node]]].push_back(node);
-  }
-
-  // Compute weighted graph
-  Graph g2;
-  g2.nb_nodes = comm_nodes.size();
-  g2.degrees.resize(comm_nodes.size());
-
-  int comm_deg = comm_nodes.size();
-  for (int comm=0 ; comm<comm_deg ; comm++) {
-    map<int,float> m;
-    map<int,float>::iterator it;
-
-    int comm_size = comm_nodes[comm].size();
-    for (int node=0 ; node<comm_size ; node++) {
-      pair<vector<unsigned int>::iterator, vector<float>::iterator> p = g.neighbors(comm_nodes[comm][node]);
-      int deg = g.nb_neighbors(comm_nodes[comm][node]);
-      for (int i=0 ; i<deg ; i++) {
-	int neigh        = *(p.first+i);
-	int neigh_comm   = renumber[n2c[neigh]];
-	double neigh_weight = (g.weights.size()==0)?1.:*(p.second+i);
-
-	it = m.find(neigh_comm);
-	if (it==m.end())
-	  m.insert(make_pair(neigh_comm, neigh_weight));
-	else
-	  it->second+=neigh_weight;
-      }
-    }
-    g2.degrees[comm]=(comm==0)?m.size():g2.degrees[comm-1]+m.size();
-    g2.nb_links+=m.size();
-
-    
-    for (it = m.begin() ; it!=m.end() ; it++) {
-      g2.total_weight  += it->second;
-      g2.links.push_back(it->first);
-      g2.weights.push_back(it->second);
-    }
-  }
-
-  return g2;
-}
 
 Graph
 Community::partition2graph_binary() {
@@ -276,8 +222,10 @@ Community::partition2graph_binary() {
 
   // Compute communities
   vector<vector<int> > comm_nodes(final);
+  n2c_new.clear();
   for (int node=0 ; node<size ; node++) {
     comm_nodes[renumber[n2c[node]]].push_back(node);
+    n2c_new[node] = renumber[n2c[node]];
   }
 
   // Compute weighted graph
