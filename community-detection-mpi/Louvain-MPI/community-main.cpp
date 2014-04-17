@@ -50,6 +50,15 @@ bool verbose = false;
 
 vector< pair<int, int> > remoteMap(10, make_pair(-1, -1));
 
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
 std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     split(s, delim, elems);
@@ -148,7 +157,7 @@ int main(int argc, char** argv) {
 
     vector<pair<int, int> > remoteMap;
 
-    ifstream remoteFileStream(r);
+    ifstream remoteFileStream(r.c_str());
     int remoteEdgeCount = 0;
 
 
@@ -161,16 +170,16 @@ int main(int argc, char** argv) {
         vector<string> parts = split(line, ' ');
         string localV = parts[0];
         string mapping = parts[1];
-        int source = atoi(localV);
+        int source = atoi(localV.c_str());
 
         vector<string> mappingParts = split(mapping, ',');
 
-        int sink = atoi(mapping[0]);
-        int partition = atoi(mapping[1]);
+        int sink = atoi(mappingParts[0].c_str());
+        int partition = atoi(mappingParts[1].c_str());
 
 
         if (remoteMap.size() <= source) {
-            s
+            
             remoteMap.resize(source + 1, make_pair(-1, -1));
 
         }
@@ -254,6 +263,8 @@ int main(int argc, char** argv) {
         GraphData data[size - 1];
         MPI_Status status;
         //get graph parts. 
+        
+        int total_nodes =0;
         for (int i = 1; i < size; i++) {
 
             MPI_Recv(&data[i - 1].nb_links, 1, MPI_LONG, i, 1, MPI_COMM_WORLD, &status);
@@ -278,12 +289,26 @@ int main(int argc, char** argv) {
                     MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].rPart.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
+            
+            total_nodes += data[i - 1].nb_nodes;
 
         }
         
         //construct new graph
-        //execute louvan
-
+        Graph newG;
+        newG.nb_nodes = total_nodes;
+        newG.degrees.resize(total_nodes);
+        
+        
+        // assume a undirected graph
+        
+        for(int i=0; i < size ; i++) {
+            // do local
+            
+            for (int j=i+1 ; j<size; j++) {
+              //do remote         
+            }       
+        }
 
 
 
