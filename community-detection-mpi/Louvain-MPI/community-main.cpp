@@ -21,6 +21,20 @@
 #include "community.h"
 using namespace std;
 
+struct GraphData {
+    unsigned int nb_nodes;
+    unsigned long nb_links;
+    double total_weight;
+
+    vector<unsigned long> degrees;
+    vector<unsigned int> links;
+    vector<float> weights;
+    vector<int> nodeToCom;
+
+    vector<int> rSource;
+    vector<int> rSink;
+    vector<int> rPart;
+};
 
 char *filename = NULL;
 char *remoteEdgesFile = NULL;
@@ -137,12 +151,12 @@ int main(int argc, char** argv) {
     ifstream remoteFileStream(r);
     int remoteEdgeCount = 0;
 
-    
-    
+
+
     vector<int> rSource;
     vector<int> rSink;
     vector<int> rpart;
-   
+
     for (string line; getline(remoteFileStream, line);) {
         vector<string> parts = split(line, ' ');
         string localV = parts[0];
@@ -162,11 +176,11 @@ int main(int argc, char** argv) {
         }
 
         remoteMap[source] = make_pair(sink, partition);
-        
+
         rSource.push_back(source);
         rSink.push_back(sink);
         rpart.push_back(partition);
-        
+
     }
 
 
@@ -204,7 +218,7 @@ int main(int argc, char** argv) {
     if (display_level == -1)
         c.display_partition();
     g = c.partition2graph_binary();
-   // c = Community(g, -1, precision);
+    // c = Community(g, -1, precision);
 
     if (verbose)
         cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
@@ -214,28 +228,64 @@ int main(int argc, char** argv) {
         display_time("  end computation from " + rank);
     if (verbose)
         cerr << "Start sending data" << endl;
+    if (rank != 0) {
+        MPI_Send(&g.nb_links, 1, MPI_LONG, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&g.nb_nodes, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&g.total_weight, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+        int nb_link = g.links.size();
+        MPI_Send(&nb_link, 1, MPI_INT, 0, 1,MPI_COMM_WORLD);
+        MPI_Send(&g.links.front(), g.links.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&g.degrees.front(), g.degrees.size(), MPI_LONG, 0, 1, MPI_COMM_WORLD);
+        int nb_weights = g.weights.size();
+        MPI_Send(&nb_weights,1,MPI_INT,0,1,MPI_COMM_WORLD);
+        MPI_Send(&g.weights.front(), g.weights.size(), MPI_FLOAT, 0, 1, MPI_COMM_WORLD);
+        
+        int r_size = rSource.size();
+        MPI_Send(&r_size,1,MPI_INT,0,1,MPI_COMM_WORLD);
+        MPI_Send(&rSource.front(), rSource.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&rSink.front(), rSink.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&rpart.front(), rpart.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
 
-    MPI_Send(&g.nb_links, 1, MPI_LONG, 0, 1, MPI_COMM_WORLD);
-    MPI_Send(&g.nb_nodes, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-    MPI_Send(&g.total_weight, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
-    MPI_Send(&g.links.front(), g.links.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
-    MPI_Send(&g.degrees.front(), g.degrees.size(), MPI_LONG, 0, 1, MPI_COMM_WORLD);
-    MPI_Send(&g.weights.front(), g.weights.size(), MPI_FLOAT, 0, 1, MPI_COMM_WORLD);
-
-    MPI_Send(&rSource.front(), rSource.size(), MPI_INT,0,1,MPI_COMM_WORLD);
-    MPI_Send(&rSink.front(), rSink.size(), MPI_INT,0,1,MPI_COMM_WORLD);
-    MPI_Send(&rpart.front(), rpart.size(), MPI_INT,0,1,MPI_COMM_WORLD);
-   
-    MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT,0,1,MPI_COMM_WORLD);
-    
+        MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+    }
     if (rank == 0) {
 
-        //get graph parts. construct
-        //new graph
+
+        GraphData data[size - 1];
+        MPI_Status status;
+        //get graph parts. 
+        for (int i = 1; i < size; i++) {
+
+            MPI_Recv(&data[i - 1].nb_links, 1, MPI_LONG, i, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&data[i - 1].nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&data[i - 1].total_weight, 1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &status);
+            int nb_links;
+            MPI_Recv(&nb_links,1,MPI_INT,i,1,MPI_COMM_WORLD,&status);            
+            MPI_Recv(&data[i - 1].links.front(), nb_links, MPI_INT, i, 1,
+                    MPI_COMM_WORLD, &status);
+            MPI_Recv(&data[i - 1].degrees.front(), data[i-1].nb_nodes, MPI_LONG, i, 1,
+                    MPI_COMM_WORLD, &status);
+            int nb_w;
+            MPI_Recv(&nb_w,1,MPI_INT,i,1,MPI_COMM_WORLD,&status);
+            MPI_Recv(&data[i - 1].weights.front(), nb_w, MPI_FLOAT, i, 1,
+                    MPI_COMM_WORLD, &status);
+            
+            int r_size;
+            MPI_Recv(&r_size,1,MPI_INT,i,1,MPI_COMM_WORLD,&status);
+            MPI_Recv(&data[i - 1].rSource.front(), r_size, MPI_INT, i, 1,
+                    MPI_COMM_WORLD, &status);
+            MPI_Recv(&data[i - 1].rSink.front(), r_size, MPI_INT, i, 1,
+                    MPI_COMM_WORLD, &status);
+            MPI_Recv(&data[i - 1].rPart.front(), r_size, MPI_INT, i, 1,
+                    MPI_COMM_WORLD, &status);
+
+        }
+        
+        //construct new graph
         //execute louvan
-        
-        
-        
+
+
+
 
 
     }

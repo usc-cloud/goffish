@@ -1,0 +1,39 @@
+called: /usr/bin/c++
+	/home/charith/phd/goffish/community-detection-mpi/Louvain-MPI
+	c++
+	-fopenmp
+	-o
+	graph_binary.o
+	-c
+	graph_binary.cpp
+	-ansi
+	-O5
+	-Wall
+	-I/usr/include/mpich2
+
+called: /usr/bin/c++
+	/home/charith/phd/goffish/community-detection-mpi/Louvain-MPI
+	c++
+	-fopenmp
+	-o
+	community.o
+	-c
+	community.cpp
+	-ansi
+	-O5
+	-Wall
+	-I/usr/include/mpich2
+
+called: /usr/bin/c++
+	/home/charith/phd/goffish/community-detection-mpi/Louvain-MPI
+	c++
+	-fopenmp
+	-o
+	community-main.o
+	-c
+	community-main.cpp
+	-ansi
+	-O5
+	-Wall
+	-I/usr/include/mpich2
+
