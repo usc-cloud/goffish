@@ -52,6 +52,17 @@ bool verbose = false;
 
 vector< pair<int, int> > remoteMap(10, make_pair(-1, -1));
 
+pair<vector<unsigned int>::iterator, vector<float>::iterator > neighbors(unsigned int node, GraphData data) {
+    assert(node >= 0 && node < data.nb_nodes);
+
+    if (node == 0)
+        return make_pair(data.links.begin(), data.weights.begin());
+    else if (data.weights.size() != 0)
+        return make_pair(data.links.begin() + data.degrees[node - 1], data.weights.begin() + data.degrees[node - 1]);
+    else
+        return make_pair(data.links.begin() + data.degrees[node - 1], data.weights.begin());
+}
+
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
     std::string item;
@@ -232,11 +243,11 @@ int main(int argc, char** argv) {
     g = c.partition2graph_binary();
     // c = Community(g, -1, precision);
 
-    
-    for(int i=0; i<rSource.size();i++) {
+
+    for (int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
-    
+
     if (verbose)
         cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
 
@@ -297,27 +308,189 @@ int main(int argc, char** argv) {
                     MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].rPart.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            MPI_Recv(&data[i - 1].nodeToCom.front(),data[i - 1].nb_nodes, MPI_INT, i, 1,
+            MPI_Recv(&data[i - 1].nodeToCom.front(), data[i - 1].nb_nodes, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-              
+
             total_nodes += data[i - 1].nb_nodes;
 
         }
 
 
-        
-        
-        
+
+
+
         //construct new graph
         Graph newG;
         newG.nb_nodes = total_nodes;
         newG.degrees.resize(total_nodes);
+        newG.nb_links = 0;
+        newG.total_weight = 0;
+        double totalWeight = 0;
+        int numberOfLinks = 0;
+        for (int i = 0; i < size; i++) {
+
+            if (i == 0) {
+                for (int node = 0; node < g.nb_nodes; node++) {
+                    //add local links
+                    //add local weights
+                    pair<vector<unsigned int>::iterator, vector<float>::iterator> p = g.neighbors(node);
+                    int deg = g.nb_neighbors(node);
+
+                    for (int e = 0; e < deg; e++) {
+                        int neigh = *(p.first + e);
+                        double weight = (g.weights.size() == 0) ? 1. : *(p.second + e);
+                        newG.total_weight += weight;
+
+                        newG.links.push_back(neigh);
+                        newG.weights.push_back(weight);
+
+                    }
 
 
-        
+                    //add remote links
+                    //add remote weights   
+
+                    map<int, float> m;
+                    map<int, float>::iterator it;
+
+                    for (int ri = 0; ri < rSource.size(); ri++) {
+                        if (rSource[ri] == node) {
+                            int targetPart = rpart[ri];
+                            int targetComm = data[targetPart].nodeToCom[rSink[ri]];
+                            int gap = 0;
+                            for (int k = 1; k < targetPart; k++) {
+                                gap += data[k].nb_nodes;
+                            }
+                            targetComm += gap;
+                            it = m.find(targetComm);
+
+                            if (it == m.end()) {
+                                m.insert(make_pair(targetComm, 1.0f));
+                            } else {
+                                it->second += 1.0f;
+                            }
+                        }
+
+                    }
+
+                    int num_rEdges = m.size();
+                    for (it = m.begin(); it != m.end(); it++) {
+                        totalWeight += it->second;
+                        newG.links.push_back(it->first);
+                        newG.weights.push_back(it->second);
+                    }
+
+                    //update degrees and number of links;
+                    newG.nb_links += num_rEdges + deg;
+                    newG.degrees[node] = (node == 0) ? (num_rEdges + deg) : newG.degrees[node - 1]+(num_rEdges + deg);
+
+                }
+
+            } else {
+
+                for (int node = 0; node < data[i].nb_nodes; node++) {
+                    //add local links
+                    //add local weights
+                    pair<vector<unsigned int>::iterator, vector<float>::iterator> p = neighbors(node, data[i]);
+                    int deg = node == 0 ? data[i].degrees[0] : (data[i].degrees[node] - data[i].degrees[node - 1]);
+
+                    for (int e = 0; e < deg; e++) {
+                        int neigh = *(p.first + e);
+                        double weight = (data[i].weights.size() == 0) ? 1. : *(p.second + e);
+                        newG.total_weight += weight;
+
+                        newG.links.push_back(neigh);
+                        newG.weights.push_back(weight);
+
+                    }
 
 
+                    //add remote links
+                    //add remote weights   
 
+                    map<int, float> m;
+                    map<int, float>::iterator it;
+
+                    for (int ri = 0; ri < data[i].rSource.size(); ri++) {
+                        if (data[i].rSource[ri] == node) {
+                            int targetPart = data[i].rPart[ri];
+                            int targetComm = data[targetPart].nodeToCom[data[i].rSink[ri]];
+                            int gap = 0;
+                            for (int k = 1; k < targetPart; k++) {
+                                gap += data[k].nb_nodes;
+                            }
+                            targetComm += gap;
+                            it = m.find(targetComm);
+
+                            if (it == m.end()) {
+                                m.insert(make_pair(targetComm, 1.0f));
+                            } else {
+                                it->second += 1.0f;
+                            }
+                        }
+
+                    }
+
+                    int num_rEdges = m.size();
+                    for (it = m.begin(); it != m.end(); it++) {
+                        totalWeight += it->second;
+                        newG.links.push_back(it->first);
+                        newG.weights.push_back(it->second);
+                    }
+
+                    //update degrees and number of links;
+                    newG.nb_links += num_rEdges + deg;
+                    newG.degrees[node] = (node == 0) ? (num_rEdges + deg) : newG.degrees[node - 1]+(num_rEdges + deg);
+
+                }
+
+            }
+
+
+        }
+
+
+        //Now graph construction is done
+
+        c = Community(newG, -1, precision);
+
+        mod = c.modularity();
+        if (verbose)
+            cerr << " new modularity " << mod << endl;
+
+        improvement = true;
+
+        do {
+
+            if (verbose) {
+                cerr << "level " << level << ":\n";
+                display_time("  start computation");
+                cerr << "  network size: "
+                        << c.g.nb_nodes << " nodes, "
+                        << c.g.nb_links << " links, "
+                        << c.g.total_weight << " weight." << endl;
+            }
+
+            improvement = c.one_level();
+            new_mod = c.modularity();
+            if (++level == display_level)
+                newG.display();
+            if (display_level == -1)
+                c.display_partition();
+            newG = c.partition2graph_binary();
+            c = Community(newG, -1, precision);
+
+            if (verbose)
+                cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
+
+            mod = new_mod;
+            if (verbose)
+                display_time("end computation");
+
+            if (filename_part != NULL && level == 1) // do at least one more computation if partition is provided
+                improvement = true;
+
+        } while (improvement);
 
     }
 
