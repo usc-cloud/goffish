@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
 
 
 
-
+    
 
 
 
@@ -217,6 +217,11 @@ int main(int argc, char** argv) {
         display_time("Begin");
     char* tmp = new char[s.length() + 1];
     strcpy(tmp, s.c_str());
+    
+    if(verbose) {
+    
+        cerr << "Init community with file name :" <<tmp << endl; 
+    }
     Community c(tmp, NULL, type, -1, precision);
     if (filename_part != NULL)
         c.init_partition(filename_part);
