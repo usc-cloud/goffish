@@ -34,6 +34,8 @@ struct GraphData {
     vector<int> rSource;
     vector<int> rSink;
     vector<int> rPart;
+
+
 };
 
 char *filename = NULL;
@@ -166,6 +168,7 @@ int main(int argc, char** argv) {
     vector<int> rSink;
     vector<int> rpart;
 
+
     for (string line; getline(remoteFileStream, line);) {
         vector<string> parts = split(line, ' ');
         string localV = parts[0];
@@ -179,7 +182,7 @@ int main(int argc, char** argv) {
 
 
         if (remoteMap.size() <= source) {
-            
+
             remoteMap.resize(source + 1, make_pair(-1, -1));
 
         }
@@ -229,6 +232,11 @@ int main(int argc, char** argv) {
     g = c.partition2graph_binary();
     // c = Community(g, -1, precision);
 
+    
+    for(int i=0; i<rSource.size();i++) {
+        rSource[i] = c.n2c_new[rSource[i]];
+    }
+    
     if (verbose)
         cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
 
@@ -242,15 +250,15 @@ int main(int argc, char** argv) {
         MPI_Send(&g.nb_nodes, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.total_weight, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
         int nb_link = g.links.size();
-        MPI_Send(&nb_link, 1, MPI_INT, 0, 1,MPI_COMM_WORLD);
+        MPI_Send(&nb_link, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.links.front(), g.links.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.degrees.front(), g.degrees.size(), MPI_LONG, 0, 1, MPI_COMM_WORLD);
         int nb_weights = g.weights.size();
-        MPI_Send(&nb_weights,1,MPI_INT,0,1,MPI_COMM_WORLD);
+        MPI_Send(&nb_weights, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.weights.front(), g.weights.size(), MPI_FLOAT, 0, 1, MPI_COMM_WORLD);
-        
+
         int r_size = rSource.size();
-        MPI_Send(&r_size,1,MPI_INT,0,1,MPI_COMM_WORLD);
+        MPI_Send(&r_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&rSource.front(), rSource.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&rSink.front(), rSink.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&rpart.front(), rpart.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
@@ -263,52 +271,50 @@ int main(int argc, char** argv) {
         GraphData data[size - 1];
         MPI_Status status;
         //get graph parts. 
-        
-        int total_nodes =0;
+
+        int total_nodes = 0;
         for (int i = 1; i < size; i++) {
 
             MPI_Recv(&data[i - 1].nb_links, 1, MPI_LONG, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].total_weight, 1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &status);
             int nb_links;
-            MPI_Recv(&nb_links,1,MPI_INT,i,1,MPI_COMM_WORLD,&status);            
+            MPI_Recv(&nb_links, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].links.front(), nb_links, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            MPI_Recv(&data[i - 1].degrees.front(), data[i-1].nb_nodes, MPI_LONG, i, 1,
+            MPI_Recv(&data[i - 1].degrees.front(), data[i - 1].nb_nodes, MPI_LONG, i, 1,
                     MPI_COMM_WORLD, &status);
             int nb_w;
-            MPI_Recv(&nb_w,1,MPI_INT,i,1,MPI_COMM_WORLD,&status);
+            MPI_Recv(&nb_w, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].weights.front(), nb_w, MPI_FLOAT, i, 1,
                     MPI_COMM_WORLD, &status);
-            
+
             int r_size;
-            MPI_Recv(&r_size,1,MPI_INT,i,1,MPI_COMM_WORLD,&status);
+            MPI_Recv(&r_size, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].rSource.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].rSink.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].rPart.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            
+            MPI_Recv(&data[i - 1].nodeToCom.front(),data[i - 1].nb_nodes, MPI_INT, i, 1,
+                    MPI_COMM_WORLD, &status);
+              
             total_nodes += data[i - 1].nb_nodes;
 
         }
+
+
+        
+        
         
         //construct new graph
         Graph newG;
         newG.nb_nodes = total_nodes;
         newG.degrees.resize(total_nodes);
+
+
         
-        
-        // assume a undirected graph
-        
-        for(int i=0; i < size ; i++) {
-            // do local
-            
-            for (int j=i+1 ; j<size; j++) {
-              //do remote         
-            }       
-        }
 
 
 
