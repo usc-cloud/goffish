@@ -40,6 +40,7 @@ struct GraphData {
 
 char *filename = NULL;
 char *remoteEdgesFile = NULL;
+char *processor_name;
 //char *remoteEdgesFile = NULL;
 char *filename_part = NULL;
 int type = UNWEIGHTED;
@@ -147,16 +148,19 @@ display_time(const char *str) {
     cerr << str << ": " << ctime(&rawtime);
 }
 
-/*
+
+
+/*[MPI_MAX_PROCESSOR_NAM
  * 
  */
 int main(int argc, char** argv) {
 
-    int rank, size;
-    MPI_Init(&argc, &argv);
+    int rank, size,namelen;
+    processor_name =new char[MPI_MAX_PROCESSOR_NAME];
+    MPI_Init(&argc, &argv);    
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
+    MPI_Get_processor_name(processor_name, &namelen);
     parse_args(argc, argv);
 
     stringstream rankS;
@@ -172,8 +176,9 @@ int main(int argc, char** argv) {
 
     ifstream remoteFileStream(r.c_str());
     int remoteEdgeCount = 0;
-
-
+    
+    if(verbose)
+        cerr << processor_name<< " : Remote File : " << r << " : graph file : " << s << endl;
 
     vector<int> rSource;
     vector<int> rSink;
@@ -218,10 +223,7 @@ int main(int argc, char** argv) {
     char* tmp = new char[s.length() + 1];
     strcpy(tmp, s.c_str());
     
-    if(verbose) {
-    
-        cerr << "Init community with file name :" <<tmp << endl; 
-    }
+   
     Community c(tmp, NULL, type, -1, precision);
     if (filename_part != NULL)
         c.init_partition(filename_part);
@@ -231,7 +233,7 @@ int main(int argc, char** argv) {
     int level = 0;
 
     if (verbose) {
-        cerr << "level " << level << ":\n";
+        cerr <<processor_name << ":"<< "level " << level << ":\n";
         display_time("  start computation");
         cerr << "  network size: "
                 << c.g.nb_nodes << " nodes, "
@@ -240,19 +242,33 @@ int main(int argc, char** argv) {
     }
 
     improvement = c.one_level();
+    
+    
+    if(verbose) {
+        cerr << processor_name << " : one level done result = " << improvement << endl;
+    }
     new_mod = c.modularity();
     if (++level == display_level)
         g.display();
     if (display_level == -1)
         c.display_partition();
+    
+    if(verbose) {
+        cerr << processor_name << " creating new graph "<< endl;
+    }
     g = c.partition2graph_binary();
     // c = Community(g, -1, precision);
-
-
+    
+    if(verbose) {
+        cerr << processor_name << " Graph creation done "<< endl;
+    }
+    
+    
     for (int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
-
+    
+    
     if (verbose)
         cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
 
