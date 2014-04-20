@@ -223,6 +223,7 @@ Community::partition2graph_binary() {
   // Compute communities
   vector<vector<int> > comm_nodes(final);
   n2c_new.clear();
+  n2c_new.resize(size);
   for (int node=0 ; node<size ; node++) {
     comm_nodes[renumber[n2c[node]]].push_back(node);
     n2c_new[node] = renumber[n2c[node]];
