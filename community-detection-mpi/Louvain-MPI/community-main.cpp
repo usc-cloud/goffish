@@ -160,9 +160,7 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);    
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    //MPI_Get_processor_name(processor_name, &namelen);
-    
-   // cout << rank << " : Done" << endl;
+
     parse_args(argc, argv);
 
     stringstream rankS;
@@ -179,8 +177,6 @@ int main(int argc, char** argv) {
     ifstream remoteFileStream(r.c_str());
     int remoteEdgeCount = 0;
     
-//    if(verbose)
-//        cerr << rank<< " : Remote File : " << r << " : graph file : " << s << endl;
 
     vector<int> rSource;
     vector<int> rSink;
@@ -210,7 +206,7 @@ int main(int argc, char** argv) {
         rSource.push_back(source);
         rSink.push_back(sink);
         rpart.push_back(partition);
-      //  cout << rank << " Remote Map :" << source << ", " << sink << ", " << partition << endl; 
+      
     }
 
 
@@ -254,10 +250,10 @@ int main(int argc, char** argv) {
     
     
 
-//    if (++level == display_level)
-//        g.display();
-//    if (display_level == -1)
-//        c.display_partition();
+    if (++level == display_level)
+        g.display();
+    if (display_level == -1)
+        c.display_partition();
     
 //    if(verbose) {
 //        cerr << processor_name << " creating new graph "<< endl;
@@ -314,9 +310,6 @@ int main(int argc, char** argv) {
     }
     if (rank == 0) {
         
-        
-       // cout << "new Graph 0" << endl;        
-        //g.display();
 
         GraphData data[size - 1];
         MPI_Status status;
@@ -326,73 +319,50 @@ int main(int argc, char** argv) {
         for (int i = 1; i < size; i++) {
 
             MPI_Recv(&data[i - 1].nb_links, 1, MPI_LONG, i, 1, MPI_COMM_WORLD, &status);
-            
-          //  cout << " Received nb_links : " << data[i - 1].nb_links << endl;
             MPI_Recv(&data[i - 1].nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
-            //cout << " Received nb_nodes : " << data[i - 1].nb_nodes << endl;
             MPI_Recv(&data[i - 1].total_weight, 1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &status);
-           // cout << " Received total w : " << data[i - 1].total_weight << endl;
             
             int nb_links;
             MPI_Recv(&nb_links, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
-            //cout << " Received nl : " << nb_links << endl;
             
             data[i-1].links.resize(nb_links);
             MPI_Recv(&data[i - 1].links.front(), nb_links, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            //cout << " Received links : " << data[i-1].links.size() << endl;
             
             
             data[i - 1].degrees.resize(data[i - 1].nb_nodes);
             MPI_Recv(&data[i - 1].degrees.front(), data[i - 1].nb_nodes, MPI_LONG, i, 1,
                     MPI_COMM_WORLD, &status);
             
-           // cout << " Received degrees : " << data[i-1].degrees.size() << endl;
-            
             int nb_w;
             MPI_Recv(&nb_w, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             data[i - 1].weights.resize(nb_w);
             MPI_Recv(&data[i - 1].weights.front(), nb_w, MPI_FLOAT, i, 1,
                     MPI_COMM_WORLD, &status);
-            //cout << " Received Weights : " << data[i-1].weights.size() << endl;
             
             int r_size;
             MPI_Recv(&r_size, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
-            //cout << " Received rsize : " << r_size <<endl;
             data[i - 1].rSource.resize(r_size);
             MPI_Recv(&data[i - 1].rSource.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            //cout << " Received source : " << data[i - 1].rSource.size() <<endl;
             data[i - 1].rSink.resize(r_size);
             MPI_Recv(&data[i - 1].rSink.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
             data[i - 1].rPart.resize(r_size);
             MPI_Recv(&data[i - 1].rPart.front(), r_size, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            //cout << " Received remote all : " << data[i - 1].rSource.size() <<endl;
-            
             int nc_size;
             MPI_Recv(&nc_size, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             
             data[i - 1].nodeToCom.resize(nc_size);
             MPI_Recv(&data[i - 1].nodeToCom.front(), nc_size, MPI_INT, i, 1,
-                    MPI_COMM_WORLD, &status);
-
-            
-            
+                    MPI_COMM_WORLD, &status);           
             total_nodes += data[i - 1].nb_nodes;
 
-        }
-
-
-     //   cout << "Data transfer complete!" << total_nodes <<endl;
-        
+        }       
 
         //construct new graph
         Graph newG;
-       // total_nodes += g.nb_nodes;
-        
-        //cout << "TOTAL NODES" << (total_nodes + g.nb_nodes) << endl;
         int totalNodes = g.nb_nodes;
         newG.nb_nodes = g.nb_nodes;
         newG.degrees.resize(g.nb_nodes);
@@ -406,7 +376,6 @@ int main(int argc, char** argv) {
 
             if (i == 0) {
                 
-                //cout << "I = 0" <<endl;
                 for (int node = 0; node < g.nb_nodes; node++) {
                     //add local links
                     //add local weights
@@ -469,9 +438,6 @@ int main(int argc, char** argv) {
 
                 }
                 
-                
-          //      cout << "Graph after 0" << endl;
-          //      newG.display();
                 nodeGap +=g.nb_nodes;
             } else {
                
@@ -482,7 +448,6 @@ int main(int argc, char** argv) {
                     //add local weights
                     pair<vector<unsigned int>::iterator, vector<float>::iterator> p = neighbors(node, data[i-1]);
                     int deg = node == 0 ? data[i-1].degrees[0] : (data[i-1].degrees[node] - data[i-1].degrees[node - 1]);
-                 //   cout << "Deg:" << deg << endl;
                     for (int e = 0; e < deg; e++) {
                         int neigh = *(p.first + e);
                         
@@ -490,7 +455,6 @@ int main(int argc, char** argv) {
 
                         double weight = (data[i-1].weights.size() == 0) ? 1. : *(p.second + e);
                         newG.total_weight += weight;
-                      //  cout << "Neigh:" << neigh << "Weight :" << *(p.second + e) <<endl; 
                         newG.links.push_back(neigh);
                         newG.weights.push_back(weight);
 
@@ -502,9 +466,7 @@ int main(int argc, char** argv) {
 
                     map<int, float> m;
                     map<int, float>::iterator it;
-                    
-                    
-                //    cout << "Remote" <<endl;
+
                     for(int ri=0;ri < data[i-1].rSource.size(); ri++ ) {
                         
                         cout <<data[i-1].rSource[ri] << "," << data[i-1].rSink[ri] << "," << data[i-1].rPart[ri] << endl;
@@ -523,9 +485,7 @@ int main(int argc, char** argv) {
                             }
                             
                             
-                            
-                            
-                          
+                                         
                             int gap = 0;
                             for (int k = 0; k < targetPart; k++) {
                                 
@@ -538,7 +498,7 @@ int main(int argc, char** argv) {
                             targetComm += gap;
                             
                             
-                      //      cout << "gap: " << gap << " target Comm : " <<targetComm << endl; 
+                     
                             it = m.find(targetComm);
 
                             if (it == m.end()) {
@@ -565,10 +525,6 @@ int main(int argc, char** argv) {
                 }
                 
                 
-             //   cout << "Graph after 1" << endl;
-             //   newG.display();                
-             //   cout << "Node Gap: " <<nodeGap << endl;
-             //   cout << " Graph size : " << newG.nb_nodes << endl;
                 nodeGap += data[i-1].nb_nodes;
 
             }
@@ -577,7 +533,7 @@ int main(int argc, char** argv) {
         }
 
 
-      //  cout <<"Now graph construction is done" <<endl;
+     
         
         c = Community(newG, -1, precision);
         mod = c.modularity();
@@ -599,10 +555,10 @@ int main(int argc, char** argv) {
 
             improvement = c.one_level();
             new_mod = c.modularity();
-//            if (++level == display_level)
-//                newG.display();
-//            if (display_level == -1)
-//                c.display_partition();
+            if (++level == display_level)
+                newG.display();
+            if (display_level == -1)
+                c.display_partition();
             newG = c.partition2graph_binary();
             c = Community(newG, -1, precision);
 
@@ -617,11 +573,13 @@ int main(int argc, char** argv) {
                 improvement = true;
 
         } while (improvement);
+        
+        cerr << new_mod << endl;
 
     }
 
     MPI_Finalize();
-
+    
     return 0;
 }
 
