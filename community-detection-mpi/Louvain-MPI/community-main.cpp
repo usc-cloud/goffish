@@ -252,8 +252,8 @@ int main(int argc, char** argv) {
 
     if (++level == display_level)
         g.display();
-    if (display_level == -1)
-        c.display_partition();
+//    if (display_level == -1)
+//        c.display_partition();
     
 //    if(verbose) {
 //        cerr << processor_name << " creating new graph "<< endl;
@@ -262,6 +262,15 @@ int main(int argc, char** argv) {
     // c = Community(g, -1, precision);
   
 
+     if (verbose) {
+        cerr <<rank << ":"<< "level " << level << ":\n";
+        display_time("  start computation");
+        cerr << "  network size: "
+                << g.nb_nodes << " nodes, "
+                << g.nb_links << " links, "
+                << g.total_weight << " weight." << endl;
+    }
+    
     
 //    if(verbose) {
 //        cerr << rank << " Graph creation done "<< endl;
@@ -307,6 +316,9 @@ int main(int argc, char** argv) {
         int nc_size = c.n2c_new.size();
         MPI_Send(&nc_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        
+         cerr <<rank << "Send done" << endl;
+        
     }
     if (rank == 0) {
         
@@ -360,6 +372,9 @@ int main(int argc, char** argv) {
             total_nodes += data[i - 1].nb_nodes;
 
         }       
+        
+                 cerr <<rank << "Rev done" << endl;
+
 
         //construct new graph
         Graph newG;
@@ -533,6 +548,9 @@ int main(int argc, char** argv) {
         }
 
 
+        cerr << rank;
+        display_time("new graph done"); 
+
      
         
         c = Community(newG, -1, precision);
@@ -557,8 +575,8 @@ int main(int argc, char** argv) {
             new_mod = c.modularity();
             if (++level == display_level)
                 newG.display();
-            if (display_level == -1)
-                c.display_partition();
+//            if (display_level == -1)
+//                c.display_partition();
             newG = c.partition2graph_binary();
             c = Community(newG, -1, precision);
 

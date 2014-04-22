@@ -14,7 +14,7 @@ char *partition_file = NULL;
 int numberOfPartitions = 1;
 
 
-void printPartition(vector<pair<int,int> > edgeList , int p);
+//void printPartition(vector<pair<int,int> > edgeList , int p);
 
 void
 usage(char *prog_name, const char *more) {
@@ -91,8 +91,7 @@ int main(int argc, char** argv) {
         if (finput.eof())
             break;
         edgeList.push_back(make_pair(src, dest));
-        nb_links++;
-        cout << src << " " << dest << endl;
+        nb_links++;    
         if (finput.eof())
             break;
 
@@ -113,26 +112,12 @@ int main(int argc, char** argv) {
         if (fpartition.eof())
             break;
         partitionMap.push_back(partition);
-        cout << vid << ":" << partitionMap[vid] << endl;
-
         vid++;
     }
 
     cout << "Loading Partition done size : " << vid << endl;
 
-
-    //   ofstream *fpartitions = new ofstream[numberOfPartitions];
-    //   ofstream *fremoteMap = new ofstream[numberOfPartitions];
-    //   
-    //   for(int i =0 ; i< numberOfPartitions; i++) {
-    //       fpartitions[i] = new ofstream;
-    //       fremoteMap[i] = new ofstream;
-    //       char* name = outfile + "_" + i + ".bin";
-    //       char* remoteName = outfile + "_" + i + ".remote";
-    //       fpartitions[i].open(name,fstream::out|fstream::binary);
-    //       fremoteMap[i].open(name,fstream::out);      
-    //   }
-    //   
+ 
 
 
 
@@ -155,16 +140,12 @@ int main(int argc, char** argv) {
 
         if (partitionMap[source - 1] == partitionMap[sink - 1]) {
             //in same partition
-            cout << "Edge : " << edgeList[i].first << ","
-                    << edgeList[i].second << ":" << partitionMap[source - 1] << endl;
-
 
             partitions[partitionMap[source - 1]].push_back(edgeList[i]);
         } else {
             //in different partitions
 
-            cout << "REdge : " << edgeList[i].first << ","
-                    << edgeList[i].second << ":" << partitionMap[source - 1] << endl;
+
             remoteEdges[partitionMap[source - 1]].push_back(edgeList[i]);
         }
 
@@ -195,7 +176,6 @@ int main(int argc, char** argv) {
 
                 map[source] = v;
                 oldToNewMap[source-1] = make_pair(v, i);
-              //  cout << vid << "in " << i << endl;
                 source = v++;
             }
 
@@ -242,8 +222,6 @@ int main(int argc, char** argv) {
 
         cout << "Partition " << i << " remote done" << endl;
 
-      //  for (int j = 0; j < partitions[i].size(); j++) {
-            //printPartition(partitions[i],i);
             Graph g(partitions[i]);
             g.clean(UNWEIGHTED);
             string st(outfile);
@@ -253,8 +231,8 @@ int main(int argc, char** argv) {
             cstr = new char[sout.length() + 1];
             strcpy(cstr, sout.c_str());
                 
-            cout << "********* Partition " << i << " ********************" <<endl;
-            g.display(UNWEIGHTED);
+           // cout << "********* Partition " << i << " ********************" <<endl;
+            //g.display(UNWEIGHTED);
             g.display_binary(cstr, NULL, UNWEIGHTED);
             delete [] cstr;
       //  }
@@ -272,15 +250,15 @@ int main(int argc, char** argv) {
     return 0;
 }
 
- void printPartition(vector<pair<int,int> > edgeList , int p) {
-        int size = edgeList.size();
-        
-        cout << "*************Partition " << p << "**************" <<endl;
-         
-        for(int i =0 ; i < size; i++) {
-            cout << edgeList[i].first << " " << edgeList[i].second << endl;
-        }
-        
-    }
+// void printPartition(vector<pair<int,int> > edgeList , int p) {
+//        int size = edgeList.size();
+//        
+//        cout << "*************Partition " << p << "**************" <<endl;
+//         
+//        for(int i =0 ; i < size; i++) {
+//            cout << edgeList[i].first << " " << edgeList[i].second << endl;
+//        }
+//        
+//    }
 
 
