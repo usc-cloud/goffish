@@ -155,6 +155,9 @@ display_time(const char *str) {
  */
 int main(int argc, char** argv) {
 
+    time_t time_begin, time_end;
+  time(&time_begin);
+    
     int rank, size,namelen;
     //processor_name =new char[MPI_MAX_PROCESSOR_NAME];
     MPI_Init(&argc, &argv);    
@@ -597,6 +600,12 @@ int main(int argc, char** argv) {
     }
 
     MPI_Finalize();
+    
+    time(&time_end);
+  if (verbose) {
+    display_time("End");
+    cerr << "Total duration: " << (time_end-time_begin) << " sec." << endl;
+  }
     
     return 0;
 }
