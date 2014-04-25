@@ -27,6 +27,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include "BetterVector.h"
 
 #define WEIGHTED   0
 #define UNWEIGHTED 1
@@ -39,9 +40,13 @@ class GraphB {
   unsigned long nb_links;
   double total_weight;  
 
-  vector<unsigned long> degrees;
-  vector<unsigned int> links;
-  vector<float> weights;
+  BetterVector<unsigned long> *degrees;
+  BetterVector<unsigned int> *links;
+  BetterVector<float> *weights;
+  
+//  vector<unsigned long> degrees;
+//  vector<unsigned int> links;
+//  vector<float> weights;
 
   GraphB();
 
@@ -73,9 +78,9 @@ GraphB::nb_neighbors(unsigned int node) {
   assert(node>=0 && node<nb_nodes);
 
   if (node==0)
-    return degrees[0];
+    return degrees->get(0);
   else
-    return degrees[node]-degrees[node-1];
+    return degrees->get(node)-degrees->get(node-1);
 }
 
 inline double
@@ -85,7 +90,7 @@ GraphB::nb_selfloops(unsigned int node) {
   pair<vector<unsigned int>::iterator, vector<float>::iterator > p = neighbors(node);
   for (unsigned int i=0 ; i<nb_neighbors(node) ; i++) {
     if (*(p.first+i)==node) {
-      if (weights.size()!=0)
+      if (weights->size!=0)
 	return (double)*(p.second+i);
       else 
 	return 1.;
@@ -98,7 +103,7 @@ inline double
 GraphB::weighted_degree(unsigned int node) {
   assert(node>=0 && node<nb_nodes);
 
-  if (weights.size()==0)
+  if (weights->size==0)
     return (double)nb_neighbors(node);
   else {
     pair<vector<unsigned int>::iterator, vector<float>::iterator > p = neighbors(node);
@@ -115,11 +120,11 @@ GraphB::neighbors(unsigned int node) {
   assert(node>=0 && node<nb_nodes);
 
   if (node==0)
-    return make_pair(links.begin(), weights.begin());
+    return make_pair(links->getPointer(0), weights->getPointer(0s).begin());
   else if (weights.size()!=0)
-    return make_pair(links.begin()+degrees[node-1], weights.begin()+degrees[node-1]);
+    return make_pair(links->getPointer(degrees[node-1]), weights->getPointer(degrees[node-1]));
   else
-    return make_pair(links.begin()+degrees[node-1], weights.begin());
+    return make_pair(links->getPointer(degrees[node-1]), weights->getPointer(0));
 }
 
 

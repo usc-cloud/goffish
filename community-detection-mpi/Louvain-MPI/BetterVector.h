@@ -67,6 +67,31 @@ public:
 
         return NULL;
     }
+    
+    vector<T>::iterator getPointer(int idx) {
+        
+        if (idx >= size) {
+            throw new exception();
+        }
+
+        int vi=0;
+        int offset=0;
+
+        int currentTotal=0;
+
+        for (int i = 0; i < sizes.size(); i++) {
+            currentTotal += sizes[i];
+            if (currentTotal > idx) {
+                vi = i;
+                offset = idx - (currentTotal - sizes[i]);
+               // cout<<i<<": " <<offset <<endl;
+                return vectors[i].begin() + offset;
+            }
+        }
+        
+        return NULL;
+    }
+    
 private:
 
 };
