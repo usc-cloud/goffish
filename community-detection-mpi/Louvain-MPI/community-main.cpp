@@ -19,6 +19,8 @@
 
 #include "graph_binary.h"
 #include "community.h"
+#include "graph_binary_better.h"
+
 using namespace std;
 
 struct GraphData {
@@ -148,19 +150,17 @@ display_time(const char *str) {
     cerr << str << ": " << ctime(&rawtime);
 }
 
-
-
 /*[MPI_MAX_PROCESSOR_NAM
  * 
  */
 int main(int argc, char** argv) {
 
     time_t time_begin, time_end;
-  time(&time_begin);
-    
-    int rank, size,namelen;
+    time(&time_begin);
+
+    int rank, size, namelen;
     //processor_name =new char[MPI_MAX_PROCESSOR_NAME];
-    MPI_Init(&argc, &argv);    
+    MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -179,11 +179,12 @@ int main(int argc, char** argv) {
 
     ifstream remoteFileStream(r.c_str());
     int remoteEdgeCount = 0;
-    
+
 
     vector<int> rSource;
     vector<int> rSink;
     vector<int> rpart;
+    MPI_Status status;
 
 
     for (string line; getline(remoteFileStream, line);) {
@@ -209,13 +210,13 @@ int main(int argc, char** argv) {
         rSource.push_back(source);
         rSink.push_back(sink);
         rpart.push_back(partition);
-      
+
     }
 
 
 
 
-    
+
 
 
 
@@ -223,8 +224,8 @@ int main(int argc, char** argv) {
         display_time("Begin");
     char* tmp = new char[s.length() + 1];
     strcpy(tmp, s.c_str());
-    
-   
+
+
     Community c(tmp, NULL, type, -1, precision);
 
     if (filename_part != NULL)
@@ -235,7 +236,7 @@ int main(int argc, char** argv) {
     int level = 0;
 
     if (verbose) {
-        cerr <<rank << ":"<< "level " << level << ":\n";
+        cerr << rank << ":" << "level " << level << ":\n";
         display_time("  start computation");
         cerr << "  network size: "
                 << c.g.nb_nodes << " nodes, "
@@ -244,59 +245,108 @@ int main(int argc, char** argv) {
     }
 
     improvement = c.one_level();
-    
-    
-//    if(verbose) {
-//        cerr << processor_name << " : one level done result = " << improvement << endl;
-//    }
+
+
+    //    if(verbose) {
+    //        cerr << processor_name << " : one level done result = " << improvement << endl;
+    //    }
     new_mod = c.modularity();
-    
-    
+
+
 
     if (++level == display_level)
         g.display();
-//    if (display_level == -1)
-//        c.display_partition();
-    
-//    if(verbose) {
-//        cerr << processor_name << " creating new graph "<< endl;
-//    }
+    //    if (display_level == -1)
+    //        c.display_partition();
+
+    //    if(verbose) {
+    //        cerr << processor_name << " creating new graph "<< endl;
+    //    }
     g = c.partition2graph_binary();
     // c = Community(g, -1, precision);
-  
 
-     if (verbose) {
-        cerr <<rank << ":"<< "level " << level << ":\n";
+
+    if (verbose) {
+        cerr << rank << ":" << "level " << level << ":\n";
         display_time("  start computation");
         cerr << "  network size: "
                 << g.nb_nodes << " nodes, "
                 << g.nb_links << " links, "
                 << g.total_weight << " weight." << endl;
     }
-    
-    
-//    if(verbose) {
-//        cerr << rank << " Graph creation done "<< endl;
-//    }
-    
-    
+
+
+    //    if(verbose) {
+    //        cerr << rank << " Graph creation done "<< endl;
+    //    }
+
+
     for (int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
-    
-    
-    
-    
-    
-    
-//    if (verbose)
-//        cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
+
+
+    int *level_one_n_nodes = new int[size];
+
+    level_one_n_nodes[rank] = g.nb_nodes;
+
+    for (int i = 0; i < size; i++) {
+
+        if (i != rank) {
+            MPI_Send(&g.nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+        }
+
+    }
+
+
+    for (int i = 0; i < size; i++) {
+
+        if (i != rank) {
+            int v;
+            MPI_Recv(&v, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
+            level_one_n_nodes[i] = v;
+        }
+
+    }
+
+    //Re-Number in parallel
+
+
+    int gap = 0;
+
+    int *gaps = new int[size];
+
+
+    for (int i = 0; i < size; i++) {
+
+        gaps[i] = gap;
+        if (i != rank)
+            gap += level_one_n_nodes[i];
+        else
+            gap += g.nb_nodes;
+
+    }
+
+
+    for (int i = 0; i < g.links.size(); i++) {
+        g.links[i] += g.links[i] + gaps[rank];
+    }
+
+
+
+
+
+
+
+
+    //    if (verbose)
+    //        cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
 
     mod = new_mod;
-//    if (verbose)
-//        display_time("  end computation from " + rank);
-//    if (verbose)
-//        cerr << "Start sending data" << endl;
+    //    if (verbose)
+    //        display_time("  end computation from " + rank);
+    //    if (verbose)
+    //        cerr << "Start sending data" << endl;
     if (rank != 0) {
         MPI_Send(&g.nb_links, 1, MPI_LONG, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.nb_nodes, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
@@ -310,7 +360,7 @@ int main(int argc, char** argv) {
         MPI_Send(&g.weights.front(), g.weights.size(), MPI_FLOAT, 0, 1, MPI_COMM_WORLD);
 
         int r_size = rSource.size();
-        
+
         //cout << "Remote date sizes source , sink , part " << rSource.size() << "," << rSink.size() << "," << rpart.size() << endl;
         MPI_Send(&r_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&rSource.front(), rSource.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
@@ -319,15 +369,14 @@ int main(int argc, char** argv) {
         int nc_size = c.n2c_new.size();
         MPI_Send(&nc_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
-        
-         cerr <<rank << "Send done" << endl;
-        
+
+        cerr << rank << "Send done" << endl;
+
     }
     if (rank == 0) {
-        
+
 
         GraphData data[size - 1];
-        MPI_Status status;
         //get graph parts. 
 
         int total_nodes = 0;
@@ -336,25 +385,25 @@ int main(int argc, char** argv) {
             MPI_Recv(&data[i - 1].nb_links, 1, MPI_LONG, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&data[i - 1].total_weight, 1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &status);
-            
+
             int nb_links;
             MPI_Recv(&nb_links, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
-            
-            data[i-1].links.resize(nb_links);
+
+            data[i - 1].links.resize(nb_links);
             MPI_Recv(&data[i - 1].links.front(), nb_links, MPI_INT, i, 1,
                     MPI_COMM_WORLD, &status);
-            
-            
+
+
             data[i - 1].degrees.resize(data[i - 1].nb_nodes);
             MPI_Recv(&data[i - 1].degrees.front(), data[i - 1].nb_nodes, MPI_LONG, i, 1,
                     MPI_COMM_WORLD, &status);
-            
+
             int nb_w;
             MPI_Recv(&nb_w, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             data[i - 1].weights.resize(nb_w);
             MPI_Recv(&data[i - 1].weights.front(), nb_w, MPI_FLOAT, i, 1,
                     MPI_COMM_WORLD, &status);
-            
+
             int r_size;
             MPI_Recv(&r_size, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
             data[i - 1].rSource.resize(r_size);
@@ -368,205 +417,102 @@ int main(int argc, char** argv) {
                     MPI_COMM_WORLD, &status);
             int nc_size;
             MPI_Recv(&nc_size, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
-            
+
             data[i - 1].nodeToCom.resize(nc_size);
             MPI_Recv(&data[i - 1].nodeToCom.front(), nc_size, MPI_INT, i, 1,
-                    MPI_COMM_WORLD, &status);           
+                    MPI_COMM_WORLD, &status);
             total_nodes += data[i - 1].nb_nodes;
 
-        }       
-        
-                 cerr <<rank << "Rev done" << endl;
+        }
+
+        cerr << rank << "Rev done" << endl;
 
 
         //construct new graph
-        Graph newG;
-        int totalNodes = g.nb_nodes;
+        GraphB newG = GraphB();
+
         newG.nb_nodes = g.nb_nodes;
-        newG.degrees.resize(g.nb_nodes);
+        //s newG->degrees.resize(g.nb_nodes);
         newG.nb_links = 0;
         newG.total_weight = 0;
-        double totalWeight = 0;
-        int numberOfLinks = 0;
-        
-        int nodeGap =0;
+
+
+       // merge graphs;
+
+
         for (int i = 0; i < size; i++) {
 
+
             if (i == 0) {
-                
-                for (int node = 0; node < g.nb_nodes; node++) {
-                    //add local links
-                    //add local weights
-                    pair<vector<unsigned int>::iterator, vector<float>::iterator> p = g.neighbors(node);
-                    int deg = g.nb_neighbors(node);
+                //local graph
 
-                    for (int e = 0; e < deg; e++) {
-                        int neigh = *(p.first + e);
-                        double weight = (g.weights.size() == 0) ? 1. : *(p.second + e);
-                        newG.total_weight += weight;
+                newG.degrees->extend(g.degrees);
+                newG.links->extend(g.links);
+                newG.weights->extend(g.weights);
+                newG.nb_links += g.nb_links;
+                newG.total_weight += g.total_weight;
 
-                        newG.links.push_back(neigh);
-                        newG.weights.push_back(weight);
-
-                    }
-
-
-                    //add remote links
-                    //add remote weights   
-
-                    map<int, float> m;
-                    map<int, float>::iterator it;
-
-                    
-                    for (int ri = 0; ri < rSource.size(); ri++) {
-                        if (rSource[ri] == node) {
-                            int targetPart = rpart[ri];
-                            int targetComm = data[targetPart-1].nodeToCom[rSink[ri]];
-                            int gap = 0;
-                            for (int k = 0; k < targetPart; k++) {
-                                
-                                if(k == 0) {
-                                    gap += g.nb_nodes;
-                                } else {
-                                    gap += data[k-1].nb_nodes;
-                                }
-                            }
-                            targetComm += gap;
-                            it = m.find(targetComm);
-
-                            if (it == m.end()) {
-                                m.insert(make_pair(targetComm, 1.0f));
-                            } else {
-                                it->second += 1.0f;
-                            }
-                        }
-
-                    }
-
-                    int num_rEdges = m.size();
-                    for (it = m.begin(); it != m.end(); it++) {
-                        totalWeight += it->second;
-                        newG.links.push_back(it->first);
-                        newG.weights.push_back(it->second);
-                    }
-
-                    //update degrees and number of links;
-                    newG.nb_links += num_rEdges + deg;
-                    newG.degrees[node] = (node == 0) ? (num_rEdges + deg) : newG.degrees[node - 1]+(num_rEdges + deg);
-
-                }
-                
-                nodeGap +=g.nb_nodes;
             } else {
-               
-                newG.nb_nodes +=  data[i-1].nb_nodes;
-                newG.degrees.resize(newG.nb_nodes);
-                for (int node = 0; node < data[i-1].nb_nodes; node++) {
-                    //add local links
-                    //add local weights
-                    pair<vector<unsigned int>::iterator, vector<float>::iterator> p = neighbors(node, data[i-1]);
-                    int deg = node == 0 ? data[i-1].degrees[0] : (data[i-1].degrees[node] - data[i-1].degrees[node - 1]);
-                    for (int e = 0; e < deg; e++) {
-                        int neigh = *(p.first + e);
-                        
-                        neigh += nodeGap;
-
-                        double weight = (data[i-1].weights.size() == 0) ? 1. : *(p.second + e);
-                        newG.total_weight += weight;
-                        newG.links.push_back(neigh);
-                        newG.weights.push_back(weight);
-
-                    }
-
-
-                    //add remote links
-                    //add remote weights   
-
-                    map<int, float> m;
-                    map<int, float>::iterator it;
-
-                    for(int ri=0;ri < data[i-1].rSource.size(); ri++ ) {
-                        
-                        cout <<data[i-1].rSource[ri] << "," << data[i-1].rSink[ri] << "," << data[i-1].rPart[ri] << endl;
-                    
-                    }
-                    
-                    for (int ri = 0; ri < data[i-1].rSource.size(); ri++) {
-                        if (data[i-1].rSource[ri] == node) {
-                            int targetPart = data[i-1].rPart[ri];
-                            int targetComm;
-                            
-                            if(targetPart ==0) {
-                                targetComm =  c.n2c_new[data[i-1].rSink[ri]];
-                            } else {
-                                targetComm = data[targetPart - 1].nodeToCom[data[i-1].rSink[ri]];
-                            }
-                            
-                            
-                                         
-                            int gap = 0;
-                            for (int k = 0; k < targetPart; k++) {
-                                
-                                if(k == 0) {
-                                    gap += g.nb_nodes;
-                                } else {
-                                    gap += data[k-1].nb_nodes;
-                                }
-                            }
-                            targetComm += gap;
-                            
-                            
-                     
-                            it = m.find(targetComm);
-
-                            if (it == m.end()) {
-                                m.insert(make_pair(targetComm, 1.0f));
-                            } else {
-                                it->second += 1.0f;
-                            }
-                        }
-
-                    }
-
-                    int num_rEdges = m.size();
-                    for (it = m.begin(); it != m.end(); it++) {
-                        totalWeight += it->second;
-                        newG.links.push_back(it->first);
-                        newG.weights.push_back(it->second);
-                    }
-
-                    //update degrees and number of links;
-                    newG.nb_links += num_rEdges + deg;                                   
-                    int actualNode = node + nodeGap;
-                    newG.degrees[actualNode] = (actualNode == 0) ? (num_rEdges + deg) : newG.degrees[actualNode - 1]+(num_rEdges + deg);
-
-                }
-                
-                
-                nodeGap += data[i-1].nb_nodes;
-
+                newG.degrees->extend(data[i - 1].degrees);
+                newG.links->extend(data[i - 1].links);
+                newG.weights->extend(data[i - 1].weights);
+                newG.nb_links += data[i - 1].nb_links;
+                newG.total_weight += data[i - 1].total_weight;
+                newG.nb_nodes += data[i - 1].nb_nodes;
             }
 
 
         }
 
 
-        cerr << rank;
-        display_time("new graph done"); 
 
-     
-        
+
+        cerr << rank;
+        display_time("new graph done");
+        cout << "New graph number of nodes: " << newG.nb_nodes << " N links :" << newG.nb_links <<endl;
+
+
         c = Community(newG, -1, precision);
-        mod = c.modularity();
+        mod = c.modularity_new();
         if (verbose)
             cerr << " new modularity " << mod << endl;
 
         improvement = true;
 
+        if (verbose) {
+            cerr << "level " << level << ":\n";
+            display_time("  start computation");
+            cerr << "  network size: "
+                    << c.gB.nb_nodes << " nodes, "
+                    << c.gB.nb_links << " links, "
+                    << c.gB.total_weight << " weight." << endl;
+        }
+
+        improvement = c.one_level_new();
+        new_mod = c.modularity_new();
+        if (++level == display_level)
+            newG.display();
+        //            if (display_level == -1)
+        //                c.display_partition();
+        Graph g2 = c.partition2graph_binary_new();
+        c = Community(g2, -1, precision);
+        newG.cleanup();
+
+        if (verbose)
+            cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
+
+        mod = new_mod;
+        if (verbose)
+            display_time("end computation");
+
+        if (filename_part != NULL && level == 1) // do at least one more computation if partition is provided
+            improvement = true;
+
+
         do {
 
             if (verbose) {
-                cerr << "level " << level << ":\n";
+                cerr << "level in loop " << level << ":\n";
                 display_time("  start computation");
                 cerr << "  network size: "
                         << c.g.nb_nodes << " nodes, "
@@ -575,13 +521,14 @@ int main(int argc, char** argv) {
             }
 
             improvement = c.one_level();
+            cerr << "One level done" << endl;
             new_mod = c.modularity();
             if (++level == display_level)
-                newG.display();
-//            if (display_level == -1)
-//                c.display_partition();
-            newG = c.partition2graph_binary();
-            c = Community(newG, -1, precision);
+                g2.display();
+            //            if (display_level == -1)
+            //                c.display_partition();
+            g2 = c.partition2graph_binary();
+            c = Community(g2, -1, precision);
 
             if (verbose)
                 cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
@@ -594,19 +541,19 @@ int main(int argc, char** argv) {
                 improvement = true;
 
         } while (improvement);
-        
+
         cerr << new_mod << endl;
 
     }
 
     MPI_Finalize();
-    
+
     time(&time_end);
-  if (verbose) {
-    display_time("End");
-    cerr << "Total duration: " << (time_end-time_begin) << " sec." << endl;
-  }
-    
+    if (verbose) {
+        display_time("End");
+        cerr << "Total duration: " << (time_end - time_begin) << " sec." << endl;
+    }
+
     return 0;
 }
 

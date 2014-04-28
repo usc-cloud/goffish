@@ -68,9 +68,11 @@ public:
         return NULL;
     }
     
-    vector<T>::iterator getPointer(int idx) {
+    typename std::vector<T>::iterator getPointer(int idx) {
         
         if (idx >= size) {
+            
+            cerr << " Get pointer Error 1: " << idx << " size : " << size<<endl;
             throw new exception();
         }
 
@@ -85,11 +87,11 @@ public:
                 vi = i;
                 offset = idx - (currentTotal - sizes[i]);
                // cout<<i<<": " <<offset <<endl;
-                return vectors[i].begin() + offset;
+                return (vectors[i].begin() + offset);
             }
         }
-        
-        return NULL;
+        cerr << " Get pointer Error 2: " << idx << " size : " << size<<endl;
+        throw new exception();
     }
     
 private:

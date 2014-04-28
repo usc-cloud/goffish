@@ -14,8 +14,8 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef GRAPHB_H
+#define GRAPHB_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -70,6 +70,8 @@ class GraphB {
 
   // return pointers to the first neighbor and first weight of the node
   inline pair<vector<unsigned int>::iterator, vector<float>::iterator > neighbors(unsigned int node);
+  
+  inline void cleanup();
 };
 
 
@@ -83,6 +85,11 @@ GraphB::nb_neighbors(unsigned int node) {
     return degrees->get(node)-degrees->get(node-1);
 }
 
+inline void GraphB::cleanup() {
+    delete degrees;
+    delete links;
+    delete weights;
+}
 inline double
 GraphB::nb_selfloops(unsigned int node) {
   assert(node>=0 && node<nb_nodes);
@@ -120,12 +127,12 @@ GraphB::neighbors(unsigned int node) {
   assert(node>=0 && node<nb_nodes);
 
   if (node==0)
-    return make_pair(links->getPointer(0), weights->getPointer(0s).begin());
-  else if (weights.size()!=0)
-    return make_pair(links->getPointer(degrees[node-1]), weights->getPointer(degrees[node-1]));
+    return make_pair(links->getPointer(0), weights->getPointer(0));
+  else if (weights->size!=0)
+    return make_pair(links->getPointer(degrees->get(node-1)), weights->getPointer(degrees->get(node-1)));
   else
-    return make_pair(links->getPointer(degrees[node-1]), weights->getPointer(0));
+    return make_pair(links->getPointer(degrees->get(node-1)), weights->getPointer(0));
 }
 
 
-#endif // GRAPH_H
+#endif 

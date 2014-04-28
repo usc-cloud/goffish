@@ -59,7 +59,7 @@ GraphB::display_reverse() {
         pair<vector<unsigned int>::iterator, vector<float>::iterator > p = neighbors(node);
         for (unsigned int i = 0; i < nb_neighbors(node); i++) {
             if (node>*(p.first + i)) {
-                if (weights->size() != 0)
+                if (weights->size != 0)
                     cout << *(p.first + i) << " " << node << " " << *(p.second + i) << endl;
                 else
                     cout << *(p.first + i) << " " << node << endl;
