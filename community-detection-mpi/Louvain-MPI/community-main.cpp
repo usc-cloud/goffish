@@ -258,7 +258,7 @@ int main(int argc, char** argv) {
     //        cerr << processor_name << " creating new graph "<< endl;
     //    }
     g = c.partition2graph_binary();
-  
+
 
     if (verbose) {
         cerr << rank << ":" << "level " << level << ":\n";
@@ -321,19 +321,24 @@ int main(int argc, char** argv) {
         g.links[i] += gaps[rank];
     }
 
-    
-    for(int i=0; i< rSource.size(); i++) {
+
+    for (int i = 0; i < rSource.size(); i++) {
         rSource[i] += gaps[rank];
     }
-    
+
+    //renumber n2c_new;
+    for (int i = 0; i < c.n2c_new.size(); i++) {
+
+        c.n2c_new[i] += gaps[rank];
+
+    }
 
 
 
 
 
-
-        if (verbose)
-            cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
+    if (verbose)
+        cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
 
     mod = new_mod;
     if (rank != 0) {
@@ -426,7 +431,7 @@ int main(int argc, char** argv) {
         newG.total_weight = 0;
 
 
-       // merge graphs;
+        // merge graphs;
 
 
         for (int i = 0; i < size; i++) {
@@ -453,26 +458,86 @@ int main(int argc, char** argv) {
 
         }
 
-        
+
         //populate remote node mapping
-        
-        map<int,vector<int> > re;
-        map<int,vector<float> > weight;
-        for(int i=0;i < size;i++) {
-            
-            
-            
-            
+
+        map<int, vector<int> > re;
+        map<int, vector<float> > weight;
+        for (int i = 0; i < size; i++) {
+
+
+            if (i == 0) {
+                map<pair<int, int>, float> m;
+                map<int, float>::iterator it;
+                for (int j = 0; j < rSource.size(); j++) {
+
+                    int sink = rSink[j];
+                    int sinkPart = rpart[j];
+
+                    int target = data[sinkPart - 1].nodeToCom[sink];
+
+                    it = m.find(make_pair(rSource[j], target));
+
+                    if (it = m.end()) {
+                        m.insert(make_pair(make_pair(rSource[j], target), 1.0f));
+                    } else {
+                        it->second += 1.0f;
+                    }
+
+                }
+
+                
+                
+                map<int,vector<int> >::iterator remoteEdgeIt;
+                map<int,vector<float>>::iterator remoteWIt;
+
+
+
+                for (it = m.begin(); it != m.end(); it++) {
+                    pair<int, int> e = it->first;
+                    float w = it->second;
+                    
+                    remoteEdgeIt = re.find(e.first);
+                    remoteWIt = weight.find(e.first); 
+                    
+                    if(remoteEdgeIt = re.end()) {
+                        
+                        vector<int> list;
+                        list.push_back(e.second);
+                        re.insert(make_pair(e.first,list));
+                        
+                        vector<float> wList;
+                        wList.insert(make_pair(e.first,w));
+                        weight.insert(make_pair(e.first,wList));
+                        
+                    } else {
+                        remoteEdgeIt->second.push_back(e.second);
+                        if(remoteWIt != m.end()) {
+                            remoteWIt->second.push_back(w);
+                        }
+                    }
+                    
+                }
+
+            } else {
+
+
+
+
+            }
+
+
+
         }
-        
-        
+
+
         //update the graph
 
 
 
         cerr << rank;
         display_time("new graph done");
-        cout << "New graph number of nodes: " << newG.nb_nodes << " N links :" << newG.nb_links <<endl;
+        cout << "New graph number of nodes: " << newG.nb_nodes << " N links :" << newG.nb_links << endl;
 
 
         c = Community(newG, -1, precision);

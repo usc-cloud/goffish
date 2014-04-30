@@ -123,9 +123,9 @@ GraphB::add_remote_edges(map<int, vector<int> > re, map<int, vector<float> > w) 
     map<int, vector<int> >::iterator itr = re.begin();
 
     int nlr = 0;
-    for (; it != re.end(); it++) {
-        int node = it->first;
-        vector<int> res = it->second;
+    for (; itr != re.end(); it++) {
+        int node = itr->first;
+        vector<int> res = itr->second;
 
         nlr += res.size();
 
