@@ -245,11 +245,6 @@ int main(int argc, char** argv) {
     }
 
     improvement = c.one_level();
-
-
-    //    if(verbose) {
-    //        cerr << processor_name << " : one level done result = " << improvement << endl;
-    //    }
     new_mod = c.modularity();
 
 
@@ -263,8 +258,7 @@ int main(int argc, char** argv) {
     //        cerr << processor_name << " creating new graph "<< endl;
     //    }
     g = c.partition2graph_binary();
-    // c = Community(g, -1, precision);
-
+  
 
     if (verbose) {
         cerr << rank << ":" << "level " << level << ":\n";
@@ -274,11 +268,6 @@ int main(int argc, char** argv) {
                 << g.nb_links << " links, "
                 << g.total_weight << " weight." << endl;
     }
-
-
-    //    if(verbose) {
-    //        cerr << rank << " Graph creation done "<< endl;
-    //    }
 
 
     for (int i = 0; i < rSource.size(); i++) {
@@ -329,24 +318,24 @@ int main(int argc, char** argv) {
 
 
     for (int i = 0; i < g.links.size(); i++) {
-        g.links[i] += g.links[i] + gaps[rank];
+        g.links[i] += gaps[rank];
     }
 
+    
+    for(int i=0; i< rSource.size(); i++) {
+        rSource[i] += gaps[rank];
+    }
+    
 
 
 
 
 
 
-
-    //    if (verbose)
-    //        cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
+        if (verbose)
+            cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
 
     mod = new_mod;
-    //    if (verbose)
-    //        display_time("  end computation from " + rank);
-    //    if (verbose)
-    //        cerr << "Start sending data" << endl;
     if (rank != 0) {
         MPI_Send(&g.nb_links, 1, MPI_LONG, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.nb_nodes, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
@@ -464,6 +453,20 @@ int main(int argc, char** argv) {
 
         }
 
+        
+        //populate remote node mapping
+        
+        map<int,vector<int> > re;
+        map<int,vector<float> > weight;
+        for(int i=0;i < size;i++) {
+            
+            
+            
+            
+        }
+        
+        
+        //update the graph
 
 
 
