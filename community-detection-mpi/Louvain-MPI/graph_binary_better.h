@@ -45,7 +45,7 @@ public:
     BetterVector<float> *weights;
 
 
-    map<int, vector<int> > remoteEdges;
+    map<int, vector<unsigned int> > remoteEdges;
     map<int, vector<float> > remote_weights;
 
     GraphB();
@@ -78,7 +78,7 @@ public:
 
     inline pair<vector<unsigned int>::iterator, vector<float>::iterator > remote_neighbors(unsigned int node);
 
-    inline void add_remote_edges(map<int, vector<int> > re, map<int, vector<float> >);
+    inline void add_remote_edges(map<int, vector<unsigned int> > re, map<int, vector<float> >);
 
     inline void cleanup();
 };
@@ -94,7 +94,7 @@ GraphB::nb_neighbors(unsigned int node) {
 }
 
 inline void
-GraphB::add_remote_edges(map<int, vector<int> > re, map<int, vector<float> > w) {
+GraphB::add_remote_edges(map<int, vector<unsigned int> > re, map<int, vector<float> > w) {
 
 
     remoteEdges = re;
@@ -120,12 +120,12 @@ GraphB::add_remote_edges(map<int, vector<int> > re, map<int, vector<float> > w) 
     total_weight += res;
 
 
-    map<int, vector<int> >::iterator itr = re.begin();
+    map<int, vector<unsigned int> >::iterator itr = re.begin();
 
     int nlr = 0;
     for (; itr != re.end(); it++) {
         int node = itr->first;
-        vector<int> res = itr->second;
+        vector<unsigned int> res = itr->second;
 
         nlr += res.size();
 
@@ -213,7 +213,8 @@ GraphB::neighbors(unsigned int node) {
 inline pair<vector<unsigned int>::iterator, vector<float>::iterator >
 GraphB::remote_neighbors(unsigned int node) {
     assert(node >= 0 && node < nb_nodes);
-    return make_pair(remoteEdges[node].begin(), remote_weights[node].begin());
+  //  vector<unsigned int>::iterator
+    return make_pair(remoteEdges.find(node)->second.begin(), remote_weights.find(node)->second.begin());
 }
 
 

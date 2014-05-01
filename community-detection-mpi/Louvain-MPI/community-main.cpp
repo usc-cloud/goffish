@@ -461,14 +461,14 @@ int main(int argc, char** argv) {
 
         //populate remote node mapping
 
-        map<int, vector<int> > re;
+        map<int, vector<unsigned int> > re;
         map<int, vector<float> > weight;
         for (int i = 0; i < size; i++) {
 
 
             if (i == 0) {
-                map<pair<int, int>, float> m;
-                map<int, float>::iterator it;
+                map<pair<int, unsigned int>, float> m;
+                map<pair<int, unsigned int>, float>::iterator it;
                 for (int j = 0; j < rSource.size(); j++) {
 
                     int sink = rSink[j];
@@ -478,7 +478,7 @@ int main(int argc, char** argv) {
 
                     it = m.find(make_pair(rSource[j], target));
 
-                    if (it = m.end()) {
+                    if (it == m.end()) {
                         m.insert(make_pair(make_pair(rSource[j], target), 1.0f));
                     } else {
                         it->second += 1.0f;
@@ -486,54 +486,99 @@ int main(int argc, char** argv) {
 
                 }
 
-                
-                
-                map<int,vector<int> >::iterator remoteEdgeIt;
-                map<int,vector<float>>::iterator remoteWIt;
+                newG.nb_links += m.size();
+
+                map<int, vector<unsigned int> >::iterator remoteEdgeIt;
+                map<int, vector<float> >::iterator remoteWIt;
 
 
 
                 for (it = m.begin(); it != m.end(); it++) {
-                    pair<int, int> e = it->first;
+                    pair<int, unsigned int> e = it->first;
                     float w = it->second;
-                    
+
                     remoteEdgeIt = re.find(e.first);
-                    remoteWIt = weight.find(e.first); 
-                    
-                    if(remoteEdgeIt = re.end()) {
-                        
-                        vector<int> list;
+                    remoteWIt = weight.find(e.first);
+
+                    if (remoteEdgeIt == re.end()) {
+
+                        vector<unsigned int> list;
                         list.push_back(e.second);
-                        re.insert(make_pair(e.first,list));
-                        
+                        re.insert(make_pair(e.first, list));
+
                         vector<float> wList;
-                        wList.insert(make_pair(e.first,w));
-                        weight.insert(make_pair(e.first,wList));
-                        
+                        wList.push_back(w);
+                        weight.insert(make_pair(e.first, wList));
+
                     } else {
                         remoteEdgeIt->second.push_back(e.second);
-                        if(remoteWIt != m.end()) {
+                        if (remoteWIt != weight.end()) {
                             remoteWIt->second.push_back(w);
                         }
                     }
-                    
+
                 }
 
             } else {
+                map<pair<int, unsigned int>, float> m;
+                map<pair<int, unsigned int>, float>::iterator it;
+                for (int j = 0; j < data[i-1].rSource.size(); j++) {
 
+                    int sink = data[i-1].rSink[j];
+                    int sinkPart = data[i-1].rPart[j];
 
+                    int target; 
+                    
+                    if(sinkPart == 0) {
+                        target = c.n2c_new[sink];
+                    } else {
+                        target = data[sinkPart - 1].nodeToCom[sink];
+                    }
+                    it = m.find(make_pair(data[i-1].rSource[j], target));
 
+                    if (it == m.end()) {
+                        m.insert(make_pair(make_pair(data[i-1].rSource[j], target), 1.0f));
+                    } else {
+                        it->second += 1.0f;
+                    }
 
+                }
+
+                newG.nb_links += m.size();
+                map<int, vector<unsigned int> >::iterator remoteEdgeIt;
+                map<int, vector<float> >::iterator remoteWIt;
+                for (it = m.begin(); it != m.end(); it++) {
+                    pair<int, int> e = it->first;
+                    float w = it->second;
+
+                    remoteEdgeIt = re.find(e.first);
+                    remoteWIt = weight.find(e.first);
+
+                    if (remoteEdgeIt == re.end()) {
+
+                        vector<unsigned int> list;
+                        list.push_back(e.second);
+                        re.insert(make_pair(e.first, list));
+
+                        vector<float> wList;
+                        wList.push_back(w);
+                        weight.insert(make_pair(e.first, wList));
+
+                    } else {
+                        remoteEdgeIt->second.push_back(e.second);
+                        if (remoteWIt != weight.end()) {
+                            remoteWIt->second.push_back(w);
+                        }
+                    }
+
+                }
             }
-
-
-
         }
 
 
         //update the graph
 
-
+        newG.add_remote_edges(re,weight);
 
         cerr << rank;
         display_time("new graph done");

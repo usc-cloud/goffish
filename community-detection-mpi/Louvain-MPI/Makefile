@@ -6,7 +6,7 @@ CFLAGS= -ansi -O5 -Wall
 LDFLAGS= -ansi -lm -Wall
 #EXEC=community converter hierarchy
 EXEC=community convert
-OBJ1= graph_binary.o community.o
+OBJ1= graph_binary_better.o graph_binary.o community.o 
 OBJ2= 	graph.o
 
 all: $(EXEC)
