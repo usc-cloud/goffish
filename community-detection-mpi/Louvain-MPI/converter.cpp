@@ -250,15 +250,5 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-// void printPartition(vector<pair<int,int> > edgeList , int p) {
-//        int size = edgeList.size();
-//        
-//        cout << "*************Partition " << p << "**************" <<endl;
-//         
-//        for(int i =0 ; i < size; i++) {
-//            cout << edgeList[i].first << " " << edgeList[i].second << endl;
-//        }
-//        
-//    }
 
 

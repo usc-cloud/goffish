@@ -457,16 +457,18 @@ int main(int argc, char** argv) {
 
 
         }
-
-
+        
+        
+        cerr << "Local Done" <<endl;
         //populate remote node mapping
-
+        newG.display();
         map<int, vector<unsigned int> > re;
         map<int, vector<float> > weight;
         for (int i = 0; i < size; i++) {
 
 
             if (i == 0) {
+                cerr << "RSource size: " << rSource.size() << endl;
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
                 for (int j = 0; j < rSource.size(); j++) {
@@ -487,11 +489,12 @@ int main(int argc, char** argv) {
                 }
 
                 newG.nb_links += m.size();
-
+                newG.total_weight += m.size();
+                
                 map<int, vector<unsigned int> >::iterator remoteEdgeIt;
                 map<int, vector<float> >::iterator remoteWIt;
 
-
+                cerr << "Populate done " << m.size() << endl;
 
                 for (it = m.begin(); it != m.end(); it++) {
                     pair<int, unsigned int> e = it->first;
@@ -518,10 +521,14 @@ int main(int argc, char** argv) {
                     }
 
                 }
+                
+                cerr << "i=0 done " << m.size() << endl;
 
             } else {
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
+                
+                cerr << "RSource size: " << data[i-1].rSource.size() << endl;
                 for (int j = 0; j < data[i-1].rSource.size(); j++) {
 
                     int sink = data[i-1].rSink[j];
@@ -544,9 +551,13 @@ int main(int argc, char** argv) {
 
                 }
 
+                cerr << "Populate done " << m.size() << endl;
                 newG.nb_links += m.size();
+                newG.total_weight += m.size();
+                
                 map<int, vector<unsigned int> >::iterator remoteEdgeIt;
                 map<int, vector<float> >::iterator remoteWIt;
+                
                 for (it = m.begin(); it != m.end(); it++) {
                     pair<int, int> e = it->first;
                     float w = it->second;
@@ -572,6 +583,8 @@ int main(int argc, char** argv) {
                     }
 
                 }
+                
+                 cerr << "i=1 done " << m.size() << endl;
             }
         }
 
@@ -583,7 +596,7 @@ int main(int argc, char** argv) {
         cerr << rank;
         display_time("new graph done");
         cout << "New graph number of nodes: " << newG.nb_nodes << " N links :" << newG.nb_links << endl;
-
+        newG.display();
 
         c = Community(newG, -1, precision);
         mod = c.modularity_new();

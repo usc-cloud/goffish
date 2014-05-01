@@ -123,7 +123,7 @@ GraphB::add_remote_edges(map<int, vector<unsigned int> > re, map<int, vector<flo
     map<int, vector<unsigned int> >::iterator itr = re.begin();
 
     int nlr = 0;
-    for (; itr != re.end(); it++) {
+    for (; itr != re.end(); itr++) {
         int node = itr->first;
         vector<unsigned int> res = itr->second;
 
