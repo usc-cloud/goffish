@@ -27,17 +27,7 @@ GraphB::GraphB() {
 
 void
 GraphB::display() {
-    /*  for (unsigned int node=0 ; node<nb_nodes ; node++) {
-        pair<vector<unsigned int>::iterator, vector<float>::iterator > p = neighbors(node);
-        for (unsigned int i=0 ; i<nb_neighbors(node) ; i++) {
-          if (node<=*(p.first+i)) {
-            if (weights.size()!=0)
-              cout << node << " " << *(p.first+i) << " " << *(p.second+i) << endl;
-            else
-              cout << node << " " << *(p.first+i) << endl;
-          }
-        }   
-      }*/
+
     for (unsigned int node = 0; node < nb_nodes; node++) {
         pair<vector<unsigned int>::iterator, vector<float>::iterator > p = neighbors(node);
         cout << node << ":";
@@ -49,6 +39,17 @@ GraphB::display() {
                     cout << " " << *(p.first + i);
             }
         }
+        
+        p = remote_neighbors(node);
+        for (unsigned int i = 0; i < nb_remote_neighbors(node); i++) {
+            if (true) {
+                if (remote_weights.find(node)->second.size() != 0)
+                    cout << " (" << *(p.first + i) << " " << *(p.second + i) << ")";
+                else
+                    cout << " " << *(p.first + i);
+            }
+        }         
+                 
         cout << endl;
     }
 }

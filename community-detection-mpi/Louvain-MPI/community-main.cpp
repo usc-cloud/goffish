@@ -243,7 +243,9 @@ int main(int argc, char** argv) {
                 << c.g.nb_links << " links, "
                 << c.g.total_weight << " weight." << endl;
     }
-
+    
+   
+    
     improvement = c.one_level();
     new_mod = c.modularity();
 
@@ -251,8 +253,8 @@ int main(int argc, char** argv) {
 
     if (++level == display_level)
         g.display();
-    //    if (display_level == -1)
-    //        c.display_partition();
+        if (display_level == -1)
+            c.display_partition();
 
     //    if(verbose) {
     //        cerr << processor_name << " creating new graph "<< endl;
@@ -270,6 +272,8 @@ int main(int argc, char** argv) {
     }
 
 
+   
+    
     for (int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
@@ -364,7 +368,7 @@ int main(int argc, char** argv) {
         MPI_Send(&nc_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
 
-        cerr << rank << "Send done" << endl;
+      
 
     }
     if (rank == 0) {
@@ -419,7 +423,7 @@ int main(int argc, char** argv) {
 
         }
 
-        cerr << rank << "Rev done" << endl;
+        
 
 
         //construct new graph
@@ -434,6 +438,10 @@ int main(int argc, char** argv) {
         // merge graphs;
 
 
+        
+        
+        
+        
         for (int i = 0; i < size; i++) {
 
 
@@ -447,6 +455,14 @@ int main(int argc, char** argv) {
                 newG.total_weight += g.total_weight;
 
             } else {
+                
+                
+                unsigned long gap = newG.degrees->get(newG.degrees->size -1);
+                
+                for(int p=0; p < data[i - 1].degrees.size();p++) {
+                    data[i - 1].degrees[p] +=gap; 
+                }
+                
                 newG.degrees->extend(data[i - 1].degrees);
                 newG.links->extend(data[i - 1].links);
                 newG.weights->extend(data[i - 1].weights);
@@ -459,16 +475,17 @@ int main(int argc, char** argv) {
         }
         
         
-        cerr << "Local Done" <<endl;
-        //populate remote node mapping
-        newG.display();
+       
+        
+         
+        
         map<int, vector<unsigned int> > re;
         map<int, vector<float> > weight;
         for (int i = 0; i < size; i++) {
 
 
             if (i == 0) {
-                cerr << "RSource size: " << rSource.size() << endl;
+                
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
                 for (int j = 0; j < rSource.size(); j++) {
@@ -489,13 +506,12 @@ int main(int argc, char** argv) {
                 }
 
                 newG.nb_links += m.size();
-                newG.total_weight += m.size();
+                //newG.total_weight += m.size();
                 
                 map<int, vector<unsigned int> >::iterator remoteEdgeIt;
                 map<int, vector<float> >::iterator remoteWIt;
 
-                cerr << "Populate done " << m.size() << endl;
-
+               
                 for (it = m.begin(); it != m.end(); it++) {
                     pair<int, unsigned int> e = it->first;
                     float w = it->second;
@@ -521,14 +537,13 @@ int main(int argc, char** argv) {
                     }
 
                 }
-                
-                cerr << "i=0 done " << m.size() << endl;
+               
 
             } else {
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
                 
-                cerr << "RSource size: " << data[i-1].rSource.size() << endl;
+               
                 for (int j = 0; j < data[i-1].rSource.size(); j++) {
 
                     int sink = data[i-1].rSink[j];
@@ -551,9 +566,9 @@ int main(int argc, char** argv) {
 
                 }
 
-                cerr << "Populate done " << m.size() << endl;
+                
                 newG.nb_links += m.size();
-                newG.total_weight += m.size();
+                //newG.total_weight += m.size();
                 
                 map<int, vector<unsigned int> >::iterator remoteEdgeIt;
                 map<int, vector<float> >::iterator remoteWIt;
@@ -584,7 +599,7 @@ int main(int argc, char** argv) {
 
                 }
                 
-                 cerr << "i=1 done " << m.size() << endl;
+                
             }
         }
 
@@ -593,10 +608,8 @@ int main(int argc, char** argv) {
 
         newG.add_remote_edges(re,weight);
 
-        cerr << rank;
-        display_time("new graph done");
-        cout << "New graph number of nodes: " << newG.nb_nodes << " N links :" << newG.nb_links << endl;
-        newG.display();
+        
+        
 
         c = Community(newG, -1, precision);
         mod = c.modularity_new();
@@ -618,8 +631,8 @@ int main(int argc, char** argv) {
         new_mod = c.modularity_new();
         if (++level == display_level)
             newG.display();
-        //            if (display_level == -1)
-        //                c.display_partition();
+        if (display_level == -1)
+            c.display_partition();
         Graph g2 = c.partition2graph_binary_new();
         c = Community(g2, -1, precision);
         newG.cleanup();
@@ -647,12 +660,12 @@ int main(int argc, char** argv) {
             }
 
             improvement = c.one_level();
-            cerr << "One level done" << endl;
+           
             new_mod = c.modularity();
             if (++level == display_level)
                 g2.display();
-            //            if (display_level == -1)
-            //                c.display_partition();
+                        if (display_level == -1)
+                            c.display_partition();
             g2 = c.partition2graph_binary();
             c = Community(g2, -1, precision);
 

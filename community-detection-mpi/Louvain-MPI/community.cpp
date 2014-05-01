@@ -233,6 +233,26 @@ Community::neigh_comm_new(unsigned int node) {
             neigh_weight[neigh_comm] += neigh_w;
         }
     } 
+    
+    
+    p = gB.remote_neighbors(node);
+    
+    deg = gB.nb_remote_neighbors(node);
+    
+    for (unsigned int i = 0; i < deg; i++) {
+        unsigned int neigh = *(p.first + i);
+        unsigned int neigh_comm = n2c[neigh];
+        double neigh_w = (gB.weights->size == 0) ? 1. : *(p.second + i);
+
+        if (neigh != node) {
+            if (neigh_weight[neigh_comm] == -1) {
+                neigh_weight[neigh_comm] = 0.;
+                neigh_pos[neigh_last++] = neigh_comm;
+            }
+            neigh_weight[neigh_comm] += neigh_w;
+        }
+    } 
+    
 
 }
 
@@ -388,6 +408,22 @@ Community::partition2graph_binary_new() {
                 else
                     it->second += neigh_weight;
             }
+            
+            
+            p = gB.remote_neighbors(comm_nodes[comm][node]);
+            deg = gB.nb_remote_neighbors(comm_nodes[comm][node]);
+            
+             for (int i = 0; i < deg; i++) {
+                int neigh = *(p.first + i);
+                int neigh_comm = renumber[n2c[neigh]];
+                double neigh_weight = (gB.weights->size == 0) ? 1. : *(p.second + i);
+
+                it = m.find(neigh_comm);
+                if (it == m.end())
+                    m.insert(make_pair(neigh_comm, neigh_weight));
+                else
+                    it->second += neigh_weight;
+            }
         }
         g2.degrees[comm] = (comm == 0) ? m.size() : g2.degrees[comm - 1] + m.size();
         g2.nb_links += m.size();
@@ -515,7 +551,7 @@ bool Community::one_level_new() {
             int node = random_order[node_tmp];
             int node_comm = n2c[node];
             double w_degree = gB.weighted_degree(node);
-
+            w_degree += gB.weighted_degree_wremote(node);
             // computation of all neighboring communities of current node
             neigh_comm_new(node);
             // remove node from its current community

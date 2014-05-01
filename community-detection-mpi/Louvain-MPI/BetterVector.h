@@ -33,13 +33,6 @@ public:
         sizes.push_back(s);
         size += s;
         vectors.push_back(vector);
-//        cout << "Added"<<endl;
-//        
-//        for(int i=0;i < vector.size();i++) {
-//            cout << vectors[vectors.size() -1][i];
-//        }
-//        
-//        cout<<endl;
        
     }
 
