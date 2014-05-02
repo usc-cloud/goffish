@@ -243,9 +243,9 @@ int main(int argc, char** argv) {
                 << c.g.nb_links << " links, "
                 << c.g.total_weight << " weight." << endl;
     }
-    
-   
-    
+
+
+
     improvement = c.one_level();
     new_mod = c.modularity();
 
@@ -253,8 +253,8 @@ int main(int argc, char** argv) {
 
     if (++level == display_level)
         g.display();
-        if (display_level == -1)
-            c.display_partition();
+    if (display_level == -1)
+        c.display_partition();
 
     //    if(verbose) {
     //        cerr << processor_name << " creating new graph "<< endl;
@@ -272,21 +272,24 @@ int main(int argc, char** argv) {
     }
 
 
-   
-    
+
+
     for (int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
 
 
     int *level_one_n_nodes = new int[size];
+    unsigned long* level_one_final_degree = new unsigned long[size];
 
     level_one_n_nodes[rank] = g.nb_nodes;
+    level_one_final_degree[rank] = g.degrees[g.degrees.size() - 1];
 
     for (int i = 0; i < size; i++) {
 
         if (i != rank) {
             MPI_Send(&g.nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+            MPI_Send(&g.degrees[g.degrees.size() - 1], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD);
         }
 
     }
@@ -296,8 +299,12 @@ int main(int argc, char** argv) {
 
         if (i != rank) {
             int v;
+            unsigned long d;
             MPI_Recv(&v, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&d, 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &status);
             level_one_n_nodes[i] = v;
+            level_one_final_degree[i] = d;
+           
         }
 
     }
@@ -336,7 +343,26 @@ int main(int argc, char** argv) {
         c.n2c_new[i] += gaps[rank];
 
     }
+    
+    
+    
 
+    //update degree in parallel
+    unsigned long deg_gap = 0;
+     
+    for (int i = 0; i < rank; i++) {
+
+        deg_gap += level_one_final_degree[i];
+      
+
+    }
+    
+    //   cerr <<"Rank:" << rank << " Gap:"<<deg_gap <<endl;
+    
+    if (rank != 0)
+        for (int i = 0; i < g.degrees.size(); i++) {
+            g.degrees[i] += deg_gap;
+        }
 
 
 
@@ -368,7 +394,7 @@ int main(int argc, char** argv) {
         MPI_Send(&nc_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
 
-      
+
 
     }
     if (rank == 0) {
@@ -423,8 +449,8 @@ int main(int argc, char** argv) {
 
         }
 
-        
 
+      
 
         //construct new graph
         GraphB newG = GraphB();
@@ -438,10 +464,10 @@ int main(int argc, char** argv) {
         // merge graphs;
 
 
-        
-        
-        
-        
+
+
+
+
         for (int i = 0; i < size; i++) {
 
 
@@ -455,14 +481,10 @@ int main(int argc, char** argv) {
                 newG.total_weight += g.total_weight;
 
             } else {
+
+
                 
-                
-                unsigned long gap = newG.degrees->get(newG.degrees->size -1);
-                
-                for(int p=0; p < data[i - 1].degrees.size();p++) {
-                    data[i - 1].degrees[p] +=gap; 
-                }
-                
+
                 newG.degrees->extend(data[i - 1].degrees);
                 newG.links->extend(data[i - 1].links);
                 newG.weights->extend(data[i - 1].weights);
@@ -473,19 +495,19 @@ int main(int argc, char** argv) {
 
 
         }
-        
-        
-       
-        
-         
-        
+
+
+
+
+
+
         map<int, vector<unsigned int> > re;
         map<int, vector<float> > weight;
         for (int i = 0; i < size; i++) {
 
 
             if (i == 0) {
-                
+
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
                 for (int j = 0; j < rSource.size(); j++) {
@@ -507,11 +529,11 @@ int main(int argc, char** argv) {
 
                 newG.nb_links += m.size();
                 //newG.total_weight += m.size();
-                
+
                 map<int, vector<unsigned int> >::iterator remoteEdgeIt;
                 map<int, vector<float> >::iterator remoteWIt;
 
-               
+
                 for (it = m.begin(); it != m.end(); it++) {
                     pair<int, unsigned int> e = it->first;
                     float w = it->second;
@@ -537,42 +559,42 @@ int main(int argc, char** argv) {
                     }
 
                 }
-               
+
 
             } else {
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
-                
-               
-                for (int j = 0; j < data[i-1].rSource.size(); j++) {
 
-                    int sink = data[i-1].rSink[j];
-                    int sinkPart = data[i-1].rPart[j];
 
-                    int target; 
-                    
-                    if(sinkPart == 0) {
+                for (int j = 0; j < data[i - 1].rSource.size(); j++) {
+
+                    int sink = data[i - 1].rSink[j];
+                    int sinkPart = data[i - 1].rPart[j];
+
+                    int target;
+
+                    if (sinkPart == 0) {
                         target = c.n2c_new[sink];
                     } else {
                         target = data[sinkPart - 1].nodeToCom[sink];
                     }
-                    it = m.find(make_pair(data[i-1].rSource[j], target));
+                    it = m.find(make_pair(data[i - 1].rSource[j], target));
 
                     if (it == m.end()) {
-                        m.insert(make_pair(make_pair(data[i-1].rSource[j], target), 1.0f));
+                        m.insert(make_pair(make_pair(data[i - 1].rSource[j], target), 1.0f));
                     } else {
                         it->second += 1.0f;
                     }
 
                 }
 
-                
+
                 newG.nb_links += m.size();
                 //newG.total_weight += m.size();
-                
+
                 map<int, vector<unsigned int> >::iterator remoteEdgeIt;
                 map<int, vector<float> >::iterator remoteWIt;
-                
+
                 for (it = m.begin(); it != m.end(); it++) {
                     pair<int, int> e = it->first;
                     float w = it->second;
@@ -598,18 +620,18 @@ int main(int argc, char** argv) {
                     }
 
                 }
-                
-                
+
+
             }
         }
 
 
         //update the graph
 
-        newG.add_remote_edges(re,weight);
+        newG.add_remote_edges(re, weight);
 
-        
-        
+
+
 
         c = Community(newG, -1, precision);
         mod = c.modularity_new();
@@ -660,12 +682,12 @@ int main(int argc, char** argv) {
             }
 
             improvement = c.one_level();
-           
+
             new_mod = c.modularity();
             if (++level == display_level)
                 g2.display();
-                        if (display_level == -1)
-                            c.display_partition();
+            if (display_level == -1)
+                c.display_partition();
             g2 = c.partition2graph_binary();
             c = Community(g2, -1, precision);
 
