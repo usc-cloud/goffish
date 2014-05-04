@@ -164,6 +164,9 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+    
+    
+    
     parse_args(argc, argv);
 
     stringstream rankS;
@@ -214,10 +217,7 @@ int main(int argc, char** argv) {
     }
 
 
-
-
-
-
+   
 
 
     if (verbose)
@@ -285,29 +285,39 @@ int main(int argc, char** argv) {
     level_one_n_nodes[rank] = g.nb_nodes;
     level_one_final_degree[rank] = g.degrees[g.degrees.size() - 1];
 
-    for (int i = 0; i < size; i++) {
+    
+        MPI_Request request[2*size -2];
+        MPI_Status st[2*size -2];
 
-        if (i != rank) {
-            MPI_Send(&g.nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
-            MPI_Send(&g.degrees[g.degrees.size() - 1], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD);
+        int idx=0;
+        for (int i = 0; i < size; i++) {
+
+            if (i != rank) {
+                int v;
+                unsigned long d;
+                MPI_Irecv(&v, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &request[idx++]);
+                MPI_Irecv(&d, 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &request[idx++]);
+                level_one_n_nodes[i] = v;
+                level_one_final_degree[i] = d;
+
+            }
+
         }
 
-    }
 
+        for (int i = 0; i < size; i++) {
 
-    for (int i = 0; i < size; i++) {
+            if (i != rank) {
+                MPI_Send(&g.nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+                MPI_Send(&g.degrees[g.degrees.size() - 1], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD);
+            }
 
-        if (i != rank) {
-            int v;
-            unsigned long d;
-            MPI_Recv(&v, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &status);
-            MPI_Recv(&d, 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &status);
-            level_one_n_nodes[i] = v;
-            level_one_final_degree[i] = d;
-           
         }
 
-    }
+        MPI_Waitall(2*size -2,request,st);
+   
+    
+    
 
     //Re-Number in parallel
 
@@ -368,31 +378,31 @@ int main(int argc, char** argv) {
 
 
     if (verbose)
-        cerr << "  modularity increased from " << mod << " to " << new_mod << endl;
+        cerr <<rank<< ":  modularity increased from " << mod << " to " << new_mod << endl;
 
     mod = new_mod;
     if (rank != 0) {
         MPI_Send(&g.nb_links, 1, MPI_LONG, 0, 1, MPI_COMM_WORLD);
         MPI_Send(&g.nb_nodes, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&g.total_weight, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&g.total_weight, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
         int nb_link = g.links.size();
-        MPI_Send(&nb_link, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&g.links.front(), g.links.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&g.degrees.front(), g.degrees.size(), MPI_LONG, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&nb_link, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&g.links.front(), g.links.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&g.degrees.front(), g.degrees.size(), MPI_LONG, 0, 1, MPI_COMM_WORLD);
         int nb_weights = g.weights.size();
-        MPI_Send(&nb_weights, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&g.weights.front(), g.weights.size(), MPI_FLOAT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&nb_weights, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&g.weights.front(), g.weights.size(), MPI_FLOAT, 0, 1, MPI_COMM_WORLD);
 
         int r_size = rSource.size();
 
         //cout << "Remote date sizes source , sink , part " << rSource.size() << "," << rSink.size() << "," << rpart.size() << endl;
-        MPI_Send(&r_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&rSource.front(), rSource.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&rSink.front(), rSink.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&rpart.front(), rpart.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&r_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&rSource.front(), rSource.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&rSink.front(), rSink.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&rpart.front(), rpart.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
         int nc_size = c.n2c_new.size();
-        MPI_Send(&nc_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&nc_size, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+        MPI_Ssend(&c.n2c_new.front(), c.n2c_new.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
 
 
 
