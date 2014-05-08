@@ -245,10 +245,14 @@ int main(int argc, char** argv) {
     }
 
 
-
+    
+    if(rank ==0) 
+        c.g.display();
     improvement = c.one_level();
     new_mod = c.modularity();
-
+    
+    
+    
 
 
     if (++level == display_level)
@@ -271,8 +275,8 @@ int main(int argc, char** argv) {
                 << g.total_weight << " weight." << endl;
     }
 
-
-
+    if(rank ==0)
+        g.display();
 
     for (int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
@@ -293,18 +297,12 @@ int main(int argc, char** argv) {
         for (int i = 0; i < size; i++) {
 
             if (i != rank) {
-                int v;
-                unsigned long d;
-                MPI_Irecv(&v, 1, MPI_INT, i, 1, MPI_COMM_WORLD, &request[idx++]);
-                MPI_Irecv(&d, 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &request[idx++]);
-                level_one_n_nodes[i] = v;
-                level_one_final_degree[i] = d;
-
+                MPI_Irecv(&level_one_n_nodes[i], 1, MPI_INT, i, 1, MPI_COMM_WORLD, &request[idx++]);
+                MPI_Irecv(&level_one_final_degree[i], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &request[idx++]);
             }
 
         }
-
-
+      
         for (int i = 0; i < size; i++) {
 
             if (i != rank) {
@@ -315,9 +313,7 @@ int main(int argc, char** argv) {
         }
 
         MPI_Waitall(2*size -2,request,st);
-   
-    
-    
+        
 
     //Re-Number in parallel
 
@@ -377,8 +373,8 @@ int main(int argc, char** argv) {
 
 
 
-    if (verbose)
-        cerr <<rank<< ":  modularity increased from " << mod << " to " << new_mod << endl;
+    if (verbose && rank ==1)
+        cerr <<rank<< ":  **modularity increased from " << mod << " to " << new_mod << endl;
 
     mod = new_mod;
     if (rank != 0) {
@@ -462,11 +458,11 @@ int main(int argc, char** argv) {
 
       
 
-        //construct new graph
+        // construct new graph
         GraphB newG = GraphB();
 
         newG.nb_nodes = g.nb_nodes;
-        //s newG->degrees.resize(g.nb_nodes);
+        // newG->degrees.resize(g.nb_nodes);
         newG.nb_links = 0;
         newG.total_weight = 0;
 
@@ -506,9 +502,9 @@ int main(int argc, char** argv) {
 
         }
 
+        cerr << "Merge local done" << endl;
 
-
-
+       
 
 
         map<int, vector<unsigned int> > re;
@@ -636,14 +632,23 @@ int main(int argc, char** argv) {
         }
 
 
+        
+        
+        
         //update the graph
-
         newG.add_remote_edges(re, weight);
 
-
+        
+        cerr << " Merge remote done" <<endl;
+        
+        
+        newG.display();
 
 
         c = Community(newG, -1, precision);
+        cerr << " Comm done" <<endl;
+        
+        
         mod = c.modularity_new();
         if (verbose)
             cerr << " new modularity " << mod << endl;

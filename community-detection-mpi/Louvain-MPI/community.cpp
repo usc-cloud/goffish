@@ -513,7 +513,7 @@ Community::one_level() {
         new_mod = modularity();
         if (nb_moves > 0)
             improvement = true;
-        cerr << "Running:" << new_mod <<":"<<cur_mod<< ":"<<((new_mod - cur_mod) > min_modularity)<<endl;
+//        cerr << "Running:" << new_mod <<":"<<cur_mod<< ":"<<((new_mod - cur_mod) > min_modularity)<<endl;
     } while (nb_moves > 0 && ((new_mod - cur_mod) > min_modularity));
 
     return improvement;
