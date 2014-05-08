@@ -17,6 +17,11 @@
 #include <algorithm>
 #include <mpi.h>
 
+
+#include <execinfo.h>
+#include <signal.h>
+#include <unistd.h>
+
 #include "graph_binary.h"
 #include "community.h"
 #include "graph_binary_better.h"
@@ -79,6 +84,20 @@ std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
+}
+
+
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
 }
 
 void
@@ -157,7 +176,7 @@ int main(int argc, char** argv) {
 
     time_t time_begin, time_end;
     time(&time_begin);
-
+    signal(SIGSEGV, handler);
     int rank, size, namelen;
     //processor_name =new char[MPI_MAX_PROCESSOR_NAME];
     MPI_Init(&argc, &argv);
@@ -485,6 +504,9 @@ int main(int argc, char** argv) {
                 newG.weights->extend(g.weights);
                 newG.nb_links += g.nb_links;
                 newG.total_weight += g.total_weight;
+                
+                
+               
 
             } else {
 
@@ -497,12 +519,14 @@ int main(int argc, char** argv) {
                 newG.nb_links += data[i - 1].nb_links;
                 newG.total_weight += data[i - 1].total_weight;
                 newG.nb_nodes += data[i - 1].nb_nodes;
+                
+               
             }
 
 
         }
 
-        cerr << "Merge local done" << endl;
+
 
        
 

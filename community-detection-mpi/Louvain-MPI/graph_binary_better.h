@@ -202,13 +202,28 @@ inline pair<vector<unsigned int>::iterator, vector<float>::iterator >
 GraphB::neighbors(unsigned int node) {
     assert(node >= 0 && node < nb_nodes);
 
+    
+    if(node>= nb_nodes) {
+        cerr<< "ERROR : " << node <<endl; 
+    }
+    
     if (node == 0)
         return make_pair(links->getPointer(0), weights->getPointer(0));
-    else if (weights->size != 0)
+    else if (weights->size != 0) {
+        //cerr<<"*******W**" << endl;
+        if(degrees->get(node - 1) == degrees->get(node)) {
+            return  make_pair(links->getPointer(links->size -1), weights->getPointer(weights->size -1));;
+        }
         return make_pair(links->getPointer(degrees->get(node - 1)), weights->getPointer(degrees->get(node - 1)));
-    else
+    } else {
+        
+        if(degrees->get(node - 1) == degrees->get(node)) {
+            return make_pair(links->getPointer(links->size -1), weights->getPointer(0));;
+        }
+         
         return make_pair(links->getPointer(degrees->get(node - 1)), weights->getPointer(0));
-}
+    }
+  }
 
 inline pair<vector<unsigned int>::iterator, vector<float>::iterator >
 GraphB::remote_neighbors(unsigned int node) {

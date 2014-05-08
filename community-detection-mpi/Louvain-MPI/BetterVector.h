@@ -26,7 +26,7 @@ public:
     };
     std::vector<T> sizes;
     std::vector< std::vector<T> > vectors;
-    int size;
+    int size=0;
 
     void extend(vector<T> &vector) {
         int s = vector.size();
@@ -51,7 +51,6 @@ public:
             if (currentTotal > idx) {
                 vi = i;
                 offset = idx - (currentTotal - sizes[i]);
-               // cout<<i<<": " <<offset <<endl;
                 return vectors[i][offset];
             }
         }
@@ -60,6 +59,7 @@ public:
 
         return NULL;
     }
+    
     
     typename std::vector<T>::iterator getPointer(int idx) {
         
