@@ -26,7 +26,7 @@ public:
     };
     std::vector<T> sizes;
     std::vector< std::vector<T> > vectors;
-    int size=0;
+    int size;
 
     void extend(vector<T> &vector) {
         int s = vector.size();
@@ -41,7 +41,7 @@ public:
             throw new exception();
         }
 
-        int vi=0;
+        //int vi=0;
         int offset=0;
 
         int currentTotal=0;
@@ -49,7 +49,7 @@ public:
         for (int i = 0; i < sizes.size(); i++) {
             currentTotal += sizes[i];
             if (currentTotal > idx) {
-                vi = i;
+               // vi = i;
                 offset = idx - (currentTotal - sizes[i]);
                 return vectors[i][offset];
             }
@@ -57,7 +57,7 @@ public:
 
 
 
-        return NULL;
+        throw new exception();
     }
     
     
@@ -69,7 +69,7 @@ public:
             throw new exception();
         }
 
-        int vi=0;
+       // int vi=0;
         int offset=0;
 
         int currentTotal=0;
@@ -77,7 +77,7 @@ public:
         for (int i = 0; i < sizes.size(); i++) {
             currentTotal += sizes[i];
             if (currentTotal > idx) {
-                vi = i;
+           //     vi = i;
                 offset = idx - (currentTotal - sizes[i]);
                // cout<<i<<": " <<offset <<endl;
                 return (vectors[i].begin() + offset);

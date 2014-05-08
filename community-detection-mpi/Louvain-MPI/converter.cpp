@@ -1,4 +1,4 @@
-/*-/**
+/*
  * Some of the code was copied from https://sites.google.com/site/findcommunities/
  */
 
@@ -127,10 +127,10 @@ int main(int argc, char** argv) {
     remoteEdges.resize(numberOfPartitions);
 
 
-    for (int i = 0; i < edgeList.size(); i++) {
+    for (unsigned int i = 0; i < edgeList.size(); i++) {
 
-        int source = edgeList[i].first;
-        int sink = edgeList[i].second;
+        unsigned int source = edgeList[i].first;
+        unsigned int sink = edgeList[i].second;
 
         if ((source > partitionMap.size()) || (sink > partitionMap.size())) {
             cout << " ERROR : " << sink << " : " << source << " " << endl;
@@ -160,10 +160,10 @@ int main(int argc, char** argv) {
     for (int i = 0; i < numberOfPartitions; i++) {
         vector<int> map;
         map.resize(vid);
-        int v = 1;
-        for (int j = 0; j < partitions[i].size(); j++) {
+        unsigned int v = 1;
+        for (unsigned int j = 0; j < partitions[i].size(); j++) {
 
-            int source = partitions[i][j].first;
+             int source = partitions[i][j].first;
             int sink = partitions[i][j].second;
           
             if (source == sink) {
@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
         strcpy(cstr, remoteName.c_str());
         fremoteList.open(cstr, fstream::out);
         delete [] cstr;
-        for (int j = 0; j < remoteEdges[i].size(); j++) {
+        for (unsigned int j = 0; j < remoteEdges[i].size(); j++) {
             int source = remoteEdges[i][j].first;
             int sink = remoteEdges[i][j].second;
             fremoteList << (oldToNewMap[source-1].first -1) << " " << (oldToNewMap[sink-1].first - 1) << "," << ( oldToNewMap[sink-1].second)<< endl;

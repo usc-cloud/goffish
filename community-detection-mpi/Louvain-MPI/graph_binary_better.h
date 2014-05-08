@@ -88,7 +88,7 @@ GraphB::nb_neighbors(unsigned int node) {
     assert(node >= 0 && node < nb_nodes);
 
     if (node == 0)
-        return degrees->get(0);
+        return degrees->get((unsigned int)0);
     else
         return degrees->get(node) - degrees->get(node - 1);
 }
@@ -111,7 +111,7 @@ GraphB::add_remote_edges(map<int, vector<unsigned int> > re, map<int, vector<flo
             int rdeg = nb_remote_neighbors(node);
             res +=rdeg;
         } else
-            for (int i = 0; i < ws.size(); i++) {
+            for (unsigned int i = 0; i < ws.size(); i++) {
                 res += ws[i];
             }
     }
@@ -124,7 +124,7 @@ GraphB::add_remote_edges(map<int, vector<unsigned int> > re, map<int, vector<flo
 
     int nlr = 0;
     for (; itr != re.end(); itr++) {
-        int node = itr->first;
+        
         vector<unsigned int> res = itr->second;
 
         nlr += res.size();
@@ -188,7 +188,7 @@ GraphB::weighted_degree_wremote(unsigned int node) {
         int deg = nb_remote_neighbors(node);
         double res = 0;
 
-        for (unsigned int i = 0; i < deg; i++) {
+        for (int i = 0; i < deg; i++) {
             res += (double) *(p.second + 1);
         }
 

@@ -18,10 +18,6 @@
 #include <mpi.h>
 
 
-#include <execinfo.h>
-#include <signal.h>
-#include <unistd.h>
-
 #include "graph_binary.h"
 #include "community.h"
 #include "graph_binary_better.h"
@@ -87,18 +83,6 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 
-void handler(int sig) {
-  void *array[10];
-  size_t size;
-
-  // get void*'s for all entries on the stack
-  size = backtrace(array, 10);
-
-  // print out all the frames to stderr
-  fprintf(stderr, "Error: signal %d:\n", sig);
-  backtrace_symbols_fd(array, size, STDERR_FILENO);
-  exit(1);
-}
 
 void
 usage(char *prog_name, const char *more) {
@@ -176,8 +160,7 @@ int main(int argc, char** argv) {
 
     time_t time_begin, time_end;
     time(&time_begin);
-    signal(SIGSEGV, handler);
-    int rank, size, namelen;
+    int rank, size;
     //processor_name =new char[MPI_MAX_PROCESSOR_NAME];
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -200,8 +183,7 @@ int main(int argc, char** argv) {
     vector<pair<int, int> > remoteMap;
 
     ifstream remoteFileStream(r.c_str());
-    int remoteEdgeCount = 0;
-
+    
 
     vector<int> rSource;
     vector<int> rSink;
@@ -213,11 +195,11 @@ int main(int argc, char** argv) {
         vector<string> parts = split(line, ' ');
         string localV = parts[0];
         string mapping = parts[1];
-        int source = atoi(localV.c_str());
+        unsigned int source = atoi(localV.c_str());
 
         vector<string> mappingParts = split(mapping, ',');
 
-        int sink = atoi(mappingParts[0].c_str());
+        unsigned int sink = atoi(mappingParts[0].c_str());
         int partition = atoi(mappingParts[1].c_str());
 
 
@@ -297,7 +279,7 @@ int main(int argc, char** argv) {
     if(rank ==0)
         g.display();
 
-    for (int i = 0; i < rSource.size(); i++) {
+    for (unsigned int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
 
@@ -353,17 +335,17 @@ int main(int argc, char** argv) {
     }
 
 
-    for (int i = 0; i < g.links.size(); i++) {
+    for (unsigned int i = 0; i < g.links.size(); i++) {
         g.links[i] += gaps[rank];
     }
 
 
-    for (int i = 0; i < rSource.size(); i++) {
+    for (unsigned int i = 0; i < rSource.size(); i++) {
         rSource[i] += gaps[rank];
     }
 
     //renumber n2c_new;
-    for (int i = 0; i < c.n2c_new.size(); i++) {
+    for (unsigned int i = 0; i < c.n2c_new.size(); i++) {
 
         c.n2c_new[i] += gaps[rank];
 
@@ -385,7 +367,7 @@ int main(int argc, char** argv) {
     //   cerr <<"Rank:" << rank << " Gap:"<<deg_gap <<endl;
     
     if (rank != 0)
-        for (int i = 0; i < g.degrees.size(); i++) {
+        for (unsigned int i = 0; i < g.degrees.size(); i++) {
             g.degrees[i] += deg_gap;
         }
 
@@ -540,7 +522,7 @@ int main(int argc, char** argv) {
 
                 map<pair<int, unsigned int>, float> m;
                 map<pair<int, unsigned int>, float>::iterator it;
-                for (int j = 0; j < rSource.size(); j++) {
+                for (unsigned int j = 0; j < rSource.size(); j++) {
 
                     int sink = rSink[j];
                     int sinkPart = rpart[j];
@@ -596,7 +578,7 @@ int main(int argc, char** argv) {
                 map<pair<int, unsigned int>, float>::iterator it;
 
 
-                for (int j = 0; j < data[i - 1].rSource.size(); j++) {
+                for (unsigned int j = 0; j < data[i - 1].rSource.size(); j++) {
 
                     int sink = data[i - 1].rSink[j];
                     int sinkPart = data[i - 1].rPart[j];
