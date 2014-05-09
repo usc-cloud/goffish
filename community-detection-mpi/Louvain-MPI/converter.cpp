@@ -85,13 +85,24 @@ int main(int argc, char** argv) {
     vector<pair<int, int> > edgeList;
     int nb_links = 0;
 
+    unsigned int psrc = 0, pdest = 0;
     while (!finput.eof()) {
         unsigned int src, dest;
         finput >> src >> dest;
+        
         if (finput.eof())
             break;
-        edgeList.push_back(make_pair(src, dest));
-        nb_links++;    
+
+        if ((src != psrc) || (dest != pdest)) {
+           // cout << src << " " << dest << endl;
+            edgeList.push_back(make_pair(src, dest));
+            nb_links++;
+            psrc = src;
+            pdest = dest;
+        } else {
+            continue;
+        }
+        
         if (finput.eof())
             break;
 
@@ -117,7 +128,7 @@ int main(int argc, char** argv) {
 
     cout << "Loading Partition done size : " << vid << endl;
 
- 
+
 
 
 
@@ -155,28 +166,30 @@ int main(int argc, char** argv) {
 
     cout << "Partitioning done" << endl;
     vector<pair<int, int> > oldToNewMap;
-    oldToNewMap.resize(vid);
+    oldToNewMap.resize(vid +1);
 
     for (int i = 0; i < numberOfPartitions; i++) {
         vector<int> map;
-        map.resize(vid);
+        map.resize(vid+1);
         unsigned int v = 1;
         for (unsigned int j = 0; j < partitions[i].size(); j++) {
 
-             int source = partitions[i][j].first;
+            int source = partitions[i][j].first;
             int sink = partitions[i][j].second;
-          
+
             if (source == sink) {
                 sink = -1;
             }
-          
+
             if (map[source] != 0) {
                 source = map[source];
+               
             } else {
 
                 map[source] = v;
-                oldToNewMap[source-1] = make_pair(v, i);
+                oldToNewMap[source - 1] = make_pair(v, i);
                 source = v++;
+             
             }
 
             if (sink == -1) {
@@ -187,11 +200,13 @@ int main(int argc, char** argv) {
 
             if (map[sink] != 0) {
                 sink = map[sink];
+                
             } else {
                 map[sink] = v;
-                oldToNewMap[sink-1] = make_pair(v, i);
-            //    cout << vid << "in " << i << endl;
+                oldToNewMap[sink - 1] = make_pair(v, i);
+                //    cout << vid << "in " << i << endl;
                 sink = v++;
+
             }
             partitions[i][j].first = source;
             partitions[i][j].second = sink;
@@ -215,35 +230,35 @@ int main(int argc, char** argv) {
         for (unsigned int j = 0; j < remoteEdges[i].size(); j++) {
             int source = remoteEdges[i][j].first;
             int sink = remoteEdges[i][j].second;
-            fremoteList << (oldToNewMap[source-1].first -1) << " " << (oldToNewMap[sink-1].first - 1) << "," << ( oldToNewMap[sink-1].second)<< endl;
+            fremoteList << (oldToNewMap[source - 1].first - 1) << " " << (oldToNewMap[sink - 1].first - 1) << "," << (oldToNewMap[sink - 1].second) << endl;
         }
 
         fremoteList.close();
 
         cout << "Partition " << i << " remote done" << endl;
 
-            Graph g(partitions[i]);
-            g.clean(UNWEIGHTED);
-            string st(outfile);
-            stringstream sst;
-            sst << i;
-            string sout = st + "_" + sst.str() + ".bin";
-            cstr = new char[sout.length() + 1];
-            strcpy(cstr, sout.c_str());
-                
-           // cout << "********* Partition " << i << " ********************" <<endl;
-            //g.display(UNWEIGHTED);
-            g.display_binary(cstr, NULL, UNWEIGHTED);
-            delete [] cstr;
-      //  }
+        Graph g(partitions[i]);
+        g.clean(UNWEIGHTED);
+        string st(outfile);
+        stringstream sst;
+        sst << i;
+        string sout = st + "_" + sst.str() + ".bin";
+        cstr = new char[sout.length() + 1];
+        strcpy(cstr, sout.c_str());
+
+        // cout << "********* Partition " << i << " ********************" <<endl;
+        //g.display(UNWEIGHTED);
+        g.display_binary(cstr, NULL, UNWEIGHTED);
+        delete [] cstr;
+        //  }
 
         cout << "Partition " << i << " local done" << endl;
 
     }
 
 
-    
-   
+
+
 
 
 

@@ -64,6 +64,7 @@ Graph::Graph (vector<pair<int,int> > edgeList) {
         unsigned int dest = edgeList[i].second -1;
         if (links.size()<=max(src,dest)+1) {
                 links.resize(max(src,dest)+1);
+                
         }
         links[src].push_back(make_pair(dest,w));
     }
@@ -140,8 +141,10 @@ Graph::display_binary(char *filename, char *filename_w, int type) {
   ofstream foutput;
   foutput.open(filename, fstream::out | fstream::binary);
 
+    
+  
   unsigned int s = links.size();
-  cout << "Number of Nodes " <<s;
+  cout << "Number of Nodes " <<s <<endl;;
   // outputs number of nodes
   foutput.write((char *)(&s),4);
 
