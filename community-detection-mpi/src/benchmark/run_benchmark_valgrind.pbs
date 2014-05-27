@@ -1,0 +1,27 @@
+#!/bin/bash
+######PBS -l nodes=1:ppn=1:gpus=1
+#PBS -l nodes=4:ppn=8:myri
+#PBS -l arch=x86_64
+#PBS -l walltime=01:00:00
+#PBS -A lc_jnc
+
+# Change to directory where qsub executed
+cd $PBS_O_WORKDIR
+
+# Setup environment
+source ../../conf/setup_hpcc.sh
+
+# Export CUDA library paths
+#export LD_LIBRARY_PATH=/usr/usc/cuda/5.0/lib64:$LD_LIBRARY_PATH
+
+# List the compute nodes assigned to the code
+echo "Compute nodes:"
+cat $PBS_NODEFILE
+echo ""
+
+# Execute program
+./run_benchmark_valgrind.sh
+
+echo "Done."
+
+
