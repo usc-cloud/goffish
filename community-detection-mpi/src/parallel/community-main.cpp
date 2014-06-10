@@ -54,6 +54,8 @@ double precision = 0.000001;
 int display_level = -2;
 int k1 = 16;
 
+int num_threads = 1;
+
 bool verbose = false;
 
 vector< pair<int, int> > remoteMap(10, make_pair(-1, -1));
@@ -83,8 +85,6 @@ std::vector<std::string> split(const std::string &s, char delim) {
     split(s, delim, elems);
     return elems;
 }
-
-
 
 void
 usage(char *prog_name, const char *more) {
@@ -121,6 +121,10 @@ parse_args(int argc, char **argv) {
                     break;
                 case 'q':
                     precision = atof(argv[i + 1]);
+                    i++;
+                    break;
+                case 't':
+                    num_threads = atoi(argv[i + 1]);
                     i++;
                     break;
                 case 'l':
@@ -165,12 +169,13 @@ int main(int argc, char** argv) {
     int rank, size;
     //processor_name =new char[MPI_MAX_PROCESSOR_NAME];
     MPI_Init(&argc, &argv);
+
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    
-    
-    
+    omp_set_num_threads(num_threads);
+
+
     parse_args(argc, argv);
 
     stringstream rankS;
@@ -185,7 +190,8 @@ int main(int argc, char** argv) {
     vector<pair<int, int> > remoteMap;
 
     ifstream remoteFileStream(r.c_str());
-    
+    //    int remoteEdgeCount = 0;
+
 
     vector<int> rSource;
     vector<int> rSink;
@@ -201,7 +207,7 @@ int main(int argc, char** argv) {
 
         vector<string> mappingParts = split(mapping, ',');
 
-        unsigned int sink = atoi(mappingParts[0].c_str());
+        int sink = atoi(mappingParts[0].c_str());
         int partition = atoi(mappingParts[1].c_str());
 
 
@@ -220,7 +226,7 @@ int main(int argc, char** argv) {
     }
 
 
-   
+
 
 
     if (verbose)
@@ -248,14 +254,10 @@ int main(int argc, char** argv) {
     }
 
 
-    
-    if(rank ==0) 
-        c.g.display();
+
     improvement = c.one_level();
     new_mod = c.modularity();
-    
-    
-    
+
 
 
     if (++level == display_level)
@@ -278,9 +280,9 @@ int main(int argc, char** argv) {
                 << g.total_weight << " weight." << endl;
     }
 
-    if(rank ==0)
-        g.display();
 
+
+#pragma omp parallel for
     for (unsigned int i = 0; i < rSource.size(); i++) {
         rSource[i] = c.n2c_new[rSource[i]];
     }
@@ -292,31 +294,31 @@ int main(int argc, char** argv) {
     level_one_n_nodes[rank] = g.nb_nodes;
     level_one_final_degree[rank] = g.degrees[g.degrees.size() - 1];
 
-    
-        MPI_Request request[2*size -2];
-        MPI_Status st[2*size -2];
 
-        int idx=0;
-        for (int i = 0; i < size; i++) {
+    MPI_Request request[2 * size - 2];
+    MPI_Status st[2 * size - 2];
 
-            if (i != rank) {
-                MPI_Irecv(&level_one_n_nodes[i], 1, MPI_INT, i, 1, MPI_COMM_WORLD, &request[idx++]);
-                MPI_Irecv(&level_one_final_degree[i], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &request[idx++]);
-            }
+    int idx = 0;
+    for (int i = 0; i < size; i++) {
 
-        }
-      
-        for (int i = 0; i < size; i++) {
-
-            if (i != rank) {
-                MPI_Send(&g.nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
-                MPI_Send(&g.degrees[g.degrees.size() - 1], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD);
-            }
-
+        if (i != rank) {
+            MPI_Irecv(&level_one_n_nodes[i], 1, MPI_INT, i, 1, MPI_COMM_WORLD, &request[idx++]);
+            MPI_Irecv(&level_one_final_degree[i], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD, &request[idx++]);
         }
 
-        MPI_Waitall(2*size -2,request,st);
-        
+    }
+
+    for (int i = 0; i < size; i++) {
+
+        if (i != rank) {
+            MPI_Send(&g.nb_nodes, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
+            MPI_Send(&g.degrees[g.degrees.size() - 1], 1, MPI_UNSIGNED_LONG, i, 2, MPI_COMM_WORLD);
+        }
+
+    }
+
+    MPI_Waitall(2 * size - 2, request, st);
+
 
     //Re-Number in parallel
 
@@ -336,38 +338,39 @@ int main(int argc, char** argv) {
 
     }
 
-
+#pragma omp parallel for
     for (unsigned int i = 0; i < g.links.size(); i++) {
         g.links[i] += gaps[rank];
     }
 
-
+#pragma omp parallel for
     for (unsigned int i = 0; i < rSource.size(); i++) {
         rSource[i] += gaps[rank];
     }
 
     //renumber n2c_new;
+#pragma omp parallel for
     for (unsigned int i = 0; i < c.n2c_new.size(); i++) {
 
         c.n2c_new[i] += gaps[rank];
 
     }
-    
-    
-    
+
+
+
 
     //update degree in parallel
     unsigned long deg_gap = 0;
-     
+
     for (int i = 0; i < rank; i++) {
 
         deg_gap += level_one_final_degree[i];
-      
+
 
     }
-    
+
     //   cerr <<"Rank:" << rank << " Gap:"<<deg_gap <<endl;
-    
+
     if (rank != 0)
         for (unsigned int i = 0; i < g.degrees.size(); i++) {
             g.degrees[i] += deg_gap;
@@ -376,8 +379,8 @@ int main(int argc, char** argv) {
 
 
 
-    if (verbose && rank ==1)
-        cerr <<rank<< ":  **modularity increased from " << mod << " to " << new_mod << endl;
+    if (verbose && rank == 1)
+        cerr << rank << ":  **modularity increased from " << mod << " to " << new_mod << endl;
 
     mod = new_mod;
     if (rank != 0) {
@@ -459,7 +462,7 @@ int main(int argc, char** argv) {
         }
 
 
-      
+
 
         // construct new graph
         GraphB newG = GraphB();
@@ -488,14 +491,11 @@ int main(int argc, char** argv) {
                 newG.weights->extend(g.weights);
                 newG.nb_links += g.nb_links;
                 newG.total_weight += g.total_weight;
-                
-                
-               
 
             } else {
 
 
-                
+
 
                 newG.degrees->extend(data[i - 1].degrees);
                 newG.links->extend(data[i - 1].links);
@@ -503,16 +503,14 @@ int main(int argc, char** argv) {
                 newG.nb_links += data[i - 1].nb_links;
                 newG.total_weight += data[i - 1].total_weight;
                 newG.nb_nodes += data[i - 1].nb_nodes;
-                
-               
             }
 
 
         }
 
+        cerr << "Merge local done" << endl;
 
 
-       
 
 
         map<int, vector<unsigned int> > re;
@@ -640,23 +638,21 @@ int main(int argc, char** argv) {
         }
 
 
-        
-        
-        
+
+
+
         //update the graph
         newG.add_remote_edges(re, weight);
 
-        
-        cerr << " Merge remote done" <<endl;
-        
-        
-        newG.display();
+
+        cerr << " Merge remote done" << endl;
+
 
 
         c = Community(newG, -1, precision);
-        cerr << " Comm done" <<endl;
-        
-        
+        cerr << " Comm done" << endl;
+
+
         mod = c.modularity_new();
         if (verbose)
             cerr << " new modularity " << mod << endl;
@@ -729,6 +725,7 @@ int main(int argc, char** argv) {
         cerr << new_mod << endl;
 
     }
+
 
     MPI_Finalize();
 
