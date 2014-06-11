@@ -76,63 +76,29 @@ A Sample small graph is located in this directory. <br>
 <li>4elt.txt - graph in edge list format.</li>
 <li>4elt.graph - graph in metis graph format. </li>
 </ul>
+</p>
+
 <br>
-First step of execution is partitioning the graph and creating the graph partitions for parallel louvain algorithm. This is done using converter-script.sh <br>
+<p>
+First step of execution is partitioning the graph and creating the graph partitions for parallel louvain algorithm. This is done using converter-script.sh <br> 
 <code>./converter-script.sh</code><br>
-
-Executing this will compile the source code, partition the graph into 2 partitions and create graph partitions. Following is an example output.
+</p><p>
+Executing this will compile the source code, partition the graph into 2 partitions and create graph partitions.
+</p>
 <br>
-<code>
-Cleaning up<br>
-...<br>
-Compiling the source code<br>
-make<br>
-mpic++ -fopenmp -o graph_binary_better.o -c graph_binary_better.cpp -ansi -O5 -Wall<br>
-mpic++ -fopenmp -o graph_binary.o -c graph_binary.cpp -ansi -O5 -Wall<br>
-....<br>
-Done compilation...<br>
-
----------------------------------------<br>
-4elt.txt : Graph in louain format<br>
-4elt.graph : Graph in metis format<br>
----------------------------------------<br>
-Partitioning the graph...<br>
-.....<br>
-$pmetis 4elt.graph 2<br>
-**********************************************************************<br>
-  METIS 4.0.1 Copyright 1998, Regents of the University of Minnesota<br>
-
-Graph Information ---------------------------------------------------<br>
-  Name: 4elt.graph, #Vertices: 15606, #Edges: 45878, #Parts: 2<br>
-
-Recursive Partitioning... -------------------------------------------<br>
-  2-way Edge-Cut:     142, Balance:  1.00 <br>
-
-Timing Information --------------------------------------------------<br>
-  I/O:          		   0.000<br>
-  Partitioning: 		   0.010   (PMETIS time)<br>
-  Total:        		   0.010<br>
-**********************************************************************<br>
-
-Converting Graph to Binery format...<br>
-./convert -i 4elt.txt -o 4elt -p 4elt.graph.part.2 -n 2
-<br>
-...<br>
-Done converting to binery..<br>
-
-</code>
-
+<p>
 Executing this will compile the source code, partition the graph into 2 partitions and create graph partitions.<br>
 To Run the the parallel louvain algorithm run the run-louvain.sh script <br>
 <code>./run-louvain.sh</code>
-
+</p><p>
 Executing this script with run the algorithm in two MPI processors and output the community graph at 2nd level of louvain method to level2.txt 
 <br>
 level2.txt contains the graph in adjacency list format.
 each line is in following format
 source: (sink1 weight1) (sink2 weight2) . . .(sinkN weightN)
 <br>
-Example:<br><br>
+</p><p>
+Example:<br><br></p>
 <code>
 0: (0 14) (1 1) (23 3) (33 4) (128 1) (134 2) (183 3) (3037 2) (3038 2) (3078 1)<br>
 1: (0 1) (1 14) (6 3) (33 4) (48 3) (74 1) (3037 1) (3053 3)<br>
