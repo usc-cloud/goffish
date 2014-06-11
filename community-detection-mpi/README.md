@@ -71,15 +71,17 @@ Log in to the virtual machine
 Source code is and sample data sets are located in /vagrant/code/louvain-mpi directory.
 <code>cd /vagrant/code/louvain-mpi</code><br>
 
-A Sample small graph is located in this directory.
-*4elt.txt - graph in edge list format. 
-*4elt.graph - graph in metis graph format. 
+A Sample small graph is located in this directory. <br>
+<ul>
+<li>4elt.txt - graph in edge list format.</li>
+<li>4elt.graph - graph in metis graph format. </li>
+</ul>
 <br>
-First step of execution is partitioning the graph and creating the graph partitions for parallel louvain algorithm. This is done using converter-script.sh
+First step of execution is partitioning the graph and creating the graph partitions for parallel louvain algorithm. This is done using converter-script.sh <br>
 <code>./converter-script.sh</code><br>
 
-Executing this will compile the source code, partition the graph into 2 partitions and create graph partitions.
-
+Executing this will compile the source code, partition the graph into 2 partitions and create graph partitions. Following is an example output.
+<br>
 <code>
 Cleaning up<br>
 ...<br>
@@ -128,28 +130,28 @@ Executing this script with run the algorithm in two MPI processors and output th
 <br>
 level2.txt contains the graph in adjacency list format.
 each line is in following format
-source: (sink1 weight1) (sink2 weight2) … (sinkN weightN)
+source: (sink1 weight1) (sink2 weight2) . . .(sinkN weightN)
 <br>
-Example:
+Example:<br><br>
 <code>
-0: (0 14) (1 1) (23 3) (33 4) (128 1) (134 2) (183 3) (3037 2) (3038 2) (3078 1)
-1: (0 1) (1 14) (6 3) (33 4) (48 3) (74 1) (3037 1) (3053 3)
-2: (2 14) (3 3) (5 3) (8 1) (9 3) (3106 2) (3108 3) (3110 1)
-3: (2 3) (3 10) (4 3) (7 1) (8 3) (3110 4)
-4: (3 3) (4 6) (7 3) (8 2) (10 3) (13 1)
-5: (2 3) (5 10) (9 1) (12 3) (16 2) (19 1) (3108 2) (3111 3)
-6: (1 3) (6 10) (21 3) (48 3) (86 1) (222 2) (3053 3)
-7: (3 1) (4 3) (7 18) (13 5) (3110 1) (3112 4)
-8: (2 1) (3 3) (4 2) (8 10) (9 3) (10 1) (11 3)
-9: (2 3) (5 1) (8 3) (9 6) (11 1) (15 1) (16 3)
-10: (4 3) (8 1) (10 6) (11 3) (13 2) (14 3)
-11: (8 3) (9 1) (10 3) (11 6) (14 1) (15 3) (27 1)
-12: (5 3) (12 10) (17 3) (19 3) (31 1) (3111 1) (3120 3)
-13: (4 1) (7 5) (10 2) (13 14) (14 3) (18 3)
-14: (10 3) (11 1) (13 3) (14 10) (18 1) (20 3) (27 3)
-15: (9 1) (11 3) (15 6) (16 3) (27 3) (29 2)
-16: (5 2) (9 3) (15 3) (16 10) (19 4) (29 1)
-17: (12 3) (17 6) (24 2) (31 3) (51 2) (72 3) (3120 1)
+0: (0 14) (1 1) (23 3) (33 4) (128 1) (134 2) (183 3) (3037 2) (3038 2) (3078 1)<br>
+1: (0 1) (1 14) (6 3) (33 4) (48 3) (74 1) (3037 1) (3053 3)<br>
+2: (2 14) (3 3) (5 3) (8 1) (9 3) (3106 2) (3108 3) (3110 1)<br>
+3: (2 3) (3 10) (4 3) (7 1) (8 3) (3110 4)<br>
+4: (3 3) (4 6) (7 3) (8 2) (10 3) (13 1)<br>
+5: (2 3) (5 10) (9 1) (12 3) (16 2) (19 1) (3108 2) (3111 3)<br>
+6: (1 3) (6 10) (21 3) (48 3) (86 1) (222 2) (3053 3)<br>
+7: (3 1) (4 3) (7 18) (13 5) (3110 1) (3112 4)<br>
+8: (2 1) (3 3) (4 2) (8 10) (9 3) (10 1) (11 3)<br>
+9: (2 3) (5 1) (8 3) (9 6) (11 1) (15 1) (16 3)<br>
+10: (4 3) (8 1) (10 6) (11 3) (13 2) (14 3)<br>
+11: (8 3) (9 1) (10 3) (11 6) (14 1) (15 3) (27 1)<br>
+12: (5 3) (12 10) (17 3) (19 3) (31 1) (3111 1) (3120 3)<br>
+13: (4 1) (7 5) (10 2) (13 14) (14 3) (18 3)<br>
+14: (10 3) (11 1) (13 3) (14 10) (18 1) (20 3) (27 3)<br>
+15: (9 1) (11 3) (15 6) (16 3) (27 3) (29 2)<br>
+16: (5 2) (9 3) (15 3) (16 10) (19 4) (29 1)<br>
+17: (12 3) (17 6) (24 2) (31 3) (51 2) (72 3) (3120 1)<br>
 </code>
 
 </p>
