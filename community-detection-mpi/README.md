@@ -1,10 +1,10 @@
-<H1>Quick start guide for parallel Louvain method for community detection</H1>
+<H1>Quick Start Guide For Parallel Louvain Method For Fast Community Detection</H1>
 
 <H2>Community Detection In Graphs</H2>
 <p>
-Interactions in online social networks, communication networks can be naturally modeled as graphs. Structural communities in graphs generally defined as groups of highly connected vertices/nodes in the graph. This groups generally represent similar interest groups, friend communities etc.  
+Interactions in online social networks, communication networks can be naturally modeled as graphs. Structural communities in graphs generally defined as groups of highly connected vertices/nodes in the graph. This groups generally represent similar interest groups, friend communities etc., that have more interactions or similarities with each other. 
 <br>
-Finding communities in large graphs is a very useful technique when trying to narrow down analytics to smaller targeted groups.This can be used for online marketing, online surveillance etc. 
+Finding communities in large graphs is a very useful technique when trying to narrow down analytics to smaller targeted groups, identifying interest groups etc. This can be used for online marketing, online surveillance etc. 
 <br>
 Detecting communities in graphs is computationally very expensive, specially for large graphs.
 </p>
@@ -15,7 +15,7 @@ Detecting communities in graphs is computationally very expensive, specially for
 <p>
 This document provides a quick guide to setting up and running our parallel implementation for <a href="https://sites.google.com/site/findcommunities/">Louvain community detection method</a> to detect non overlapping communities in large graphs . 
 <br>
-Lovain community detection method detect communities in a graph in a hierarchical manner. At each level detected communities are reduced to vertices, reducing the graph size. This enable zoom in and out of high level communities. 
+Lovain community detection method detect communities in a graph in a hierarchical manner. At each level detected communities are reduced to vertices, reducing the graph size. This enable zoom in and out of high level communities to find communities at a lower level. 
 </p>
 
 <img src="https://sites.google.com/site/findcommunities/pol.jpg" height="300" width="500"/>
@@ -34,7 +34,7 @@ Pre installed virtual machine is used in this guide which can be installed in yo
 <H3>Setting up</H3>
 <p>
 Install Oracle Virtual Box 4.3.8. You can download it from <a href="https://www.virtualbox.org/wiki/Download_Old_Builds_4_3">here</a>.
-
+<br>
 Install and configure Vagrant<br>
 <code>sudo apt-get install vagrant</code>
 <br>
