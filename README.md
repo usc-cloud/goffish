@@ -72,4 +72,4 @@ Installation
 
 A quick start guide can be found [here](QuickStart.md) together with a precompiled VM to help you get started.
 
-A detailed guide on how to install the software on a distributed setup can be found [here](/path/to/GoFFish-install).
+A detailed guide on goffish and how to install the software on a distributed setup can be found [here](goffish-trunk/README.txt).
