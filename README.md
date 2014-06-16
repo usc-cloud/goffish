@@ -3,7 +3,7 @@ Overview
 
 Sensors and online instruments performing high fidelity observations are contributing in a large measure to the growing big data analytics challenge. These datasets are unique in that they represent events, observations and activities that are related to each other while being recorded by independent data streams. GoFFish (Graph-Oriented Framework for Foresight and Insight using Scalable Heuristics) is a scalable graph-oriented analytics framework well suited for processing reservoirs of interconnected distributed data fed by event data generators. It minimizes the communication overhead by grouping together tightly bind data.
  
-![GoFFish concept](/path/to/GoFFish.png "GoFFish concept.")
+![GoFFish concept](http://losangeles.usc.edu/usc-cloud/goffish/GoFFish.png "GoFFish concept.")
 
 Objectives
 ----------
@@ -70,6 +70,6 @@ Numerous enhancements are in progress, most of them related to dealing with dete
 Installation
 ------------
 
-A quick start guide can be found [here](/path/to/GoFFish-quick-start) together with a precompiled VM to help you get started.
+A quick start guide can be found [here](QuickStart.md) together with a precompiled VM to help you get started.
 
 A detailed guide on how to install the software on a distributed setup can be found [here](/path/to/GoFFish-install).
