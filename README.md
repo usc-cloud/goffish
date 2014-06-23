@@ -116,4 +116,4 @@ Installation
 
 A quick start guide can be found [here](QuickStart.md) together with a precompiled VM to help you get started.
 
-GoFFish consists of a Graph File System which can be used as a stand alone producut. Detailed documentation can be found [here](goffish-trunk/gofs/docs/README.md)
+GoFFish consists of a Graph File System which can be used as a stand alone producut. Detailed deployment documentation can be found [here](goffish-trunk/gofs/docs/README.md)
