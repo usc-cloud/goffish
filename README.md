@@ -103,6 +103,8 @@ Clone the repository using
 
 Note: You may need to install a git client to download the repository.
 
+Current source code is located at goffish/goffish-trunk directory
+
 
 Future enhancements
 -------------------
