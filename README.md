@@ -106,14 +106,22 @@ Note: You may need to install a git client to download the repository.
 Current source code is located at goffish/goffish-trunk directory
 
 
+
 Future enhancements
 -------------------
 
 Numerous enhancements are in progress, most of them related to dealing with detecting online events that can occur in evolving streaming graphs. The loop between insight and foresight will be closed by coupling event patterns mined from historical stream reservoirs with graph analytics based on real-time event streams from sensors.
+
+
 
 Installation
 ------------
 
 A quick start guide can be found [here](QuickStart.md) together with a precompiled VM to help you get started.
 
-GoFFish consists of a Graph File System which can be used as a stand alone producut. Detailed deployment documentation can be found [here](goffish-trunk/gofs/docs/README.md)
+GoFFish consists of a Graph File System(GoFS) which can be used as a standalone product. Detailed deployment documentation can be found [here](goffish-trunk/gofs/docs/README.md)
+
+Gopher is the distributed subgraph centric programming framwork of GoFFish. Gopher programming API overview and an example can be found [here](goffish-trunk/gopher/docs/GopherAPIGuide.md). Deployment details of Gopher Can be found [here] (goffish-trunk/gopher/docs/GopherdeploymentGuide.pdf) 
+
+
+
