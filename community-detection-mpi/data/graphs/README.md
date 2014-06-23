@@ -1,2 +1,0 @@
-Synthetic graphs go here.
-
