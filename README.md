@@ -12,7 +12,7 @@ Objectives
 
 **Efficiently store interconnected data by using a specialized graph-oriented file system**:
 
-*	Support for widely used graph formats such as GraphML**
+*	Support for widely used graph formats such as GML
 *	Take advantage of the various graph information and layout to enable efficient data loading
 *	Facilitate storing temporal data to enable analytics on evolving graphs 
 *	Enable distributed information storage in-line with current trends observed in cloud systems
