@@ -71,23 +71,23 @@ Required Skill Sets
 
  * Required
 
-  * Familiarity with Linux
+   * Familiarity with Linux
 
-  * Manipulating graph data (potentially to convert the given data to GML format)
+   * Manipulating graph data (potentially to convert the given data to GML format)
 
-  * Java programming skills
+   * Java programming skills
 
  * Good to have
 
-  * Familiarity with Virtual Box and virtualization to quickly deploy using the quick guide
+   * Familiarity with Virtual Box and virtualization to quickly deploy using the quick guide
 
-  * Experience with the BSP programming model
+   * Experience with the BSP programming model
 
  * To setup the environment on a cluster
 
-  * Cluster administration knowledge
+   * Cluster administration knowledge
 
-  * Linux cluster administration skills
+   * Linux cluster administration skills
 
 How to get it
 ---------------
