@@ -40,12 +40,11 @@ Other useful vagrant commands:<br>
 <code>vagrant suspend</code><br>
 Saves the current running state of the machine and stops it. vagrant up will resume.
 
-<code>vagrant halt</code><br>
-Gracefully shuts down the vm. vagrant up will boot it back up.
+<code>vagrant halt</code> gracefully shuts down the VM. 
 <br>
-<code>vagrant destroy</code>
+<code>vagrant up</code> will boot it back up.
 <br>
-Destroys the vm (and all the cruft inside of it). vagrant up will reprovision and run the deploy scripts again.
+<code>vagrant destroy</code> destroys the VM (and all the cruft inside of it). Running <code>vagrant up</code> at this point will reprovision and run the deploy scripts again.
 <br>
 More info at http://www.vagrantup.com/
 </p>
@@ -63,11 +62,11 @@ Change the password of root user and changed to root user:<br>
 <code>$sudo passwd root</code><br>
 <code>$su root</code><br>
 </p><p>
-Move GoFS and and Gopher Server to goffish_home directory:<br> 
-<code>$mv gopher-server-2.0 goffish_home/</code><br>
-<code>$mv gofs-2.0/ goffish_home/</code><br>
+Move GoFS and and Gopher Server to <i>$GOFFISH_HOME</i> directory:<br> 
+<code>$mv gopher-server-2.0 $GOFFISH_HOME/</code><br>
+<code>$mv gofs-2.0/ $GOFFISH_HOME/</code><br>
 </p><p>
-Start the namenode. A namenode is an interface that tracks all the metadata for a particular GoFS installation. At the moment GoFS ships with a REST server based namenode, which can be run through the GoFSNameNode script. This script accepts a URI argument and attempts to start a name node REST server at this URI. Optionally a file may also be specified which is used to save name node state. It is recommended you always specify a save file or name node state may be lost if the process is killed. Once a name node exists it is referenced through a java class type and a URI. The default type is edu.usc.goffish.gofs.namenode.RemoteNameNode which can communicate with a remote REST server based name node.<br>
+Start the namenode. A namenode is an interface that tracks all the metadata for a particular GoFS installation. At the moment GoFS ships with a REST server based namenode, which can be run through the GoFSNameNode script. This script accepts a URI argument and attempts to start a name node REST server at this URI. Optionally a file may also be specified which is used to save name node state. It is recommended you always specify a save file or name node state may be lost if the process is killed. Once a name node exists it is referenced through a Java class type and a URI. The default type is <i>edu.usc.goffish.gofs.namenode.RemoteNameNode</i> which can communicate with a remote REST server based name node.<br>
 </p><p>
 <code>cd $GOFFISH_HOME/gofs-2.0/bin</code><br>
 <code>./GoFSNameNode http://localhost:9998</code><br>
@@ -78,7 +77,7 @@ Login to vm from another terminal:<br>
 Change to root:<br>
 <code>$su root</code><br>
 </p><p>
-Create directory named <i>gofs-data</i> in <i>GOFFISH_HOME</i>. This will be used to store the graph data in binary format:<br>
+Create directory named <i>gofs-data</i> in <i>$GOFFISH_HOME</i>. This will be used to store the graph data in binary format:<br>
 <code>$mkdir $GOFFISH_HOME/gofs-data</code><br>
 </p><p>
 Edit <i>gofs.config</i> located at <i>/home/vagrant/deployment/goffish_home/gofs-2.0/conf</i>. Change the datanode path to  
@@ -91,7 +90,7 @@ Change in to GoFS binary directory and and format the graph file system:<br>
 <code>$./GoFSFormat</code><br>
 </p>
 <p>
-A Sample graph which can be used is located at <i>/home/vagrant/deployment/samples/gofs-samples</i> directory. To deploy this graph in the GoFS file system we need to create a list of graph and graph instances. In this example we will be only using graph template which is equivalent to a static graph.
+A sample graph which can be used is located at <i>/home/vagrant/deployment/samples/gofs-samples</i> directory. To deploy this graph in the GoFS file system we need to create a list of graph and graph instances. In this example we will be only using graph template which is equivalent to a static graph.
 
 Create a file named <i>list.xml</i> in the <i>/home/vagrant/deployment/samples/gofs-samples</i> directory
 </p> <p>
