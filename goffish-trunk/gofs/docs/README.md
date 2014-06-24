@@ -39,6 +39,16 @@ In order to format a new installation, the user must first edit the conf file in
 
 but requires the user to edit the config file found in the conf/ folder first. Within this config file, you must specify the name node this installation will be using, list all machines used in the GoFS cluster under the datanode section, and specify the method of serialization at each datanode.
 
+Data Format
+------------
+
+GoFS take graphs in GML format. http://en.wikipedia.org/wiki/Graph_Modelling_Language. 
+
+Graph Template which contains the graph strcture (vertices and edges) must be converted to GML format. 
+Sample GML File Can be found [here](https://github.com/usc-cloud/goffish/blob/master/goffish-trunk/gofs/code/modules/gofs-distribution/sample-applications/Template.gml)
+
+Graph Instance represent a graph at a given time duration. While goffish can be used to run algorithms on static graphs only using the template; If you want to store graph snapshots. Thy should be also converted in to GML format. Example graph instance of above template can be found [here] (https://github.com/usc-cloud/goffish/blob/master/goffish-trunk/gofs/code/modules/gofs-distribution/sample-applications/Instance_0.gml)
+
 Deployment
 ----------
 
