@@ -5,6 +5,8 @@ Sensors and online instruments performing high fidelity observations are contrib
  
 ![GoFFish concept](http://losangeles.usc.edu/usc-cloud/goffish/GoFFish.png "GoFFish concept.")
 
+A printable executive summary can be found [here](GoFFish-exec-summary.pdf)
+
 Objectives
 ----------
 
@@ -98,7 +100,7 @@ Clone the repository using:
 
 Note: You may need to install a git client to download the repository.
 
-Current source code is located at goffish/goffish-trunk directory
+Current source code is located in the *goffish/goffish-trunk* directory
 
 
 

@@ -83,10 +83,10 @@ Create directory named *gofs-data* in *GOFFISH_HOME*. This will be used to store
 </p><p>
 Edit gofs.config located at */home/vagrant/deployment/goffish_home/gofs-2.0/conf*. Change the datanode path to  
 <code>gofs.datanode = file://localhost/home/vagrant/deployment/goffish_home/gofs-data/ </code> <br>
-Set name node url property in gofs.config to <code>http://localhost:9998</code> <br>
+Set name node URL property in gofs.config to <code>http://localhost:9998</code> <br>
 </p>
 <p>
-Change in to GoFS binery directroy and and format the graph file system:<br> 
+Change in to GoFS binary directory and and format the graph file system:<br> 
 <code>$cd $GOFFISH_HOME/gofs-2.0/bin</code><br>
 <code>$./GoFSFormat</code><br>
 </p>
