@@ -78,10 +78,10 @@ Login to vm from another terminal:<br>
 Change to root:<br>
 <code>$su root</code><br>
 </p><p>
-Create directory named *gofs-data* in *GOFFISH_HOME*. This will be used to store the graph data in binary format:<br>
+Create directory named <i>gofs-data</i> in <i>GOFFISH_HOME</i>. This will be used to store the graph data in binary format:<br>
 <code>$mkdir $GOFFISH_HOME/gofs-data</code><br>
 </p><p>
-Edit gofs.config located at */home/vagrant/deployment/goffish_home/gofs-2.0/conf*. Change the datanode path to  
+Edit <i>gofs.config</i> located at <i>/home/vagrant/deployment/goffish_home/gofs-2.0/conf</i>. Change the datanode path to  
 <code>gofs.datanode = file://localhost/home/vagrant/deployment/goffish_home/gofs-data/ </code> <br>
 Set name node URL property in gofs.config to <code>http://localhost:9998</code> <br>
 </p>
@@ -91,9 +91,9 @@ Change in to GoFS binary directory and and format the graph file system:<br>
 <code>$./GoFSFormat</code><br>
 </p>
 <p>
-A Sample graph which can be used is located at */home/vagrant/deployment/samples/gofs-samples* directory. To deploy this graph in the GoFS file system we need to create a list of graph and graph instances. In this example we will be only using graph template which is equivalent to a static graph.
+A Sample graph which can be used is located at <i>/home/vagrant/deployment/samples/gofs-samples</i> directory. To deploy this graph in the GoFS file system we need to create a list of graph and graph instances. In this example we will be only using graph template which is equivalent to a static graph.
 
-Create a file named *list.xml* in the */home/vagrant/deployment/samples/gofs-samples* directory
+Create a file named <i>list.xml</i> in the <i>/home/vagrant/deployment/samples/gofs-samples</i> directory
 </p> <p>
 <code>
 <gml>
@@ -126,10 +126,10 @@ The above command will list the deployment directory locations in the distribute
 <code>$./DeployGopher.sh /home/vagrant/deployment/goffish_home/gofs-2.0/conf/gofs.config localhost localhost</code><br>
 </p>
 <p>
-Now Every thing is setup and ready to run gopher applications. You can run gopher applications using the GopherClient command.<br>
+Now everything is setup and ready to run gopher applications. You can run gopher applications using the GopherClient command:<br>
 <code>$./GopherClient.sh /home/vagrant/deployment/gopher-client-2.0/gopher-config.xml /home/vagrant/deployment/goffish_home/gofs-2.0/conf/gofs.config graph1 vert-count-2.0.jar edu.usc.pgroup.goffish.gopher.sample.VertCounter NILL</code><br>
 </p><p>
-Executing this algorithm will output the vertex count of the input graph. You can find the results in *$GOFFISH_HOME/gopher-server-2.0/vert-count.txt*
+Executing this algorithm will output the vertex count of the input graph. You can find the results in <i>$GOFFISH_HOME/gopher-server-2.0/vert-count.txt</i>
 </p>
 <p>
 Mode detailed informations regarding general deployment of <a href="https://github.com/usc-cloud/goffish/tree/master/goffish-trunk/gofs/docs">GoFS</a> and <a href="https://github.com/usc-cloud/goffish/tree/master/goffish-trunk/gopher/docs">Gopher</a> is available in GitHub.
