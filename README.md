@@ -25,35 +25,6 @@ Objectives
 *	Performance improvement for analytics that require sub-graph knowledge, e.g., community analytics, high impact nodes, shortest paths
 *	Suited for graphs that can be partitioned evenly across processors with minimal communication between them, e.g., sparse graphs (road networks), Internet/network graphs
 
-
-Required Skill Sets
--------------------
-
-* To use the algorithm on a given data set.
-
- *Required
-
-  * Familiarity with Linux
-
-  * Manipulating graph data (potentially to convert the given data to GML format)
-
-  * Java programming skills
-
- *Good to have
-
-  * To use the quick start guide, familiarity with Virtual Box and virtualization
-
-  * To integrate the algorithm with other components
- 
-  * Exprience with BSP programming model
-
- * To setup the environment on a cluster
-
-  * Cluster administration
-
-  * Linux cluster adminstration skills
-
-
 Benefits
 --------
 
@@ -91,13 +62,37 @@ Measures of effectiveness
 
 We evaluated our platform on a configuration representative for both clouds and commodity clusters. The system comprised of cluster of 12 nodes, each with an 8-core Intel Xeon CPU, 16 GB RAM, 1 TB SATA HDD, and connected by Gigabit Ethernet. We have compared the platform against the main competitor, Apache Giraph. Both systems were installed using Java 7 JRE for 64 bit Ubuntu Linux. The datasets consisted of three real world graphs: California road network (1.6M nodes x 2.7M edges), a network trace route (20M nodes x 23M edges), and the Live Journal social network (5M nodes x 65M edges). Different graph analytics such as connected components, shortest path and page rank were deployed on it and their speed-ups were measured. An average improvement of 10x was observed.
 
+Required Skill Sets
+-------------------
+
+* To use the framework on a given data set:
+
+ * Required
+
+  * Familiarity with Linux
+
+  * Manipulating graph data (potentially to convert the given data to GML format)
+
+  * Java programming skills
+
+ * Good to have
+
+  * Familiarity with Virtual Box and virtualization to quickly deploy using the quick guide
+
+  * Experience with the BSP programming model
+
+ * To setup the environment on a cluster
+
+  * Cluster administration knowledge
+
+  * Linux cluster administration skills
 
 How to get it
 ---------------
 
-The algorithm is hosted at the git hub repository at https://github.com/usc-cloud/goffish
+The framework is hosted in the GitHub repository at https://github.com/usc-cloud/goffish
 
-Clone the repository using
+Clone the repository using:
 
 <code>git clone https://github.com/usc-cloud/goffish.git</code>
 
@@ -119,9 +114,9 @@ Installation
 
 A quick start guide can be found [here](QuickStart.md) together with a precompiled VM to help you get started.
 
-GoFFish consists of a Graph File System(GoFS) which can be used as a standalone product. Detailed deployment documentation can be found [here](goffish-trunk/gofs/docs/README.md)
+GoFFish consists of a Graph File System (GoFS) which can be used as a standalone product. Detailed deployment documentation can be found [here](goffish-trunk/gofs/docs/README.md)
 
-Gopher is the distributed subgraph centric programming framwork of GoFFish. Gopher programming API overview and an example can be found [here](goffish-trunk/gopher/docs/GopherAPIGuide.md). Deployment details of Gopher Can be found [here] (goffish-trunk/gopher/docs/GopherdeploymentGuide.pdf) 
+Gopher is the distributed subgraph centric programming framework of GoFFish. Gopher programming API overview and an example can be found [here](goffish-trunk/gopher/docs/GopherAPIGuide.md). Deployment details of Gopher can be found [here] (goffish-trunk/gopher/docs/GopherdeploymentGuide.pdf) 
 
 
 
