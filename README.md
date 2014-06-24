@@ -31,7 +31,7 @@ Benefits
 --------
 
 GoFFish offers several key benefits to developers…
-*	Conversion pipeline from widely used graph formats such as GraphML
+*	Conversion pipeline from widely used graph formats such as GML
 *	Specialized graph-oriented file system to easily store interconnected evolving data
 *	High level API for composing graph analytics on static and evolving graphs
 *	Easily customizable output for interfacing with various visualization tools
