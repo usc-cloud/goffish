@@ -113,7 +113,7 @@ Gopher is the distributed subgraph centric programming framework of GoFFish. Gop
 
 User and Development Discussions
 --------------------------------
-All GoFFish development discussions and user discussions are new movied to a open forum. If you have any questions regarding GoFFish or if you want to contribute; Please join our discussion forum [here] (http://groups.google.com/d/forum/usc-cloud)
+All GoFFish development discussions and user discussions were movied to an open forum. If you have any questions regarding GoFFish or if you want to contribute; Please join our discussion forum [here] (http://groups.google.com/d/forum/usc-cloud)
 
 
 Future enhancements
