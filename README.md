@@ -111,6 +111,11 @@ GoFFish consists of a Graph File System (GoFS) which can be used as a standalone
 
 Gopher is the distributed subgraph centric programming framework of GoFFish. Gopher programming API overview and an example can be found [here](goffish-trunk/gopher/docs/GopherAPIGuide.md). Deployment details of Gopher can be found [here] (goffish-trunk/gopher/docs/GopherdeploymentGuide.pdf) 
 
+User and Development Discussions
+--------------------------------
+All GoFFish development discussions and user discussions are new movied to a open forum. If you have any questions regarding GoFFish or if you want to contribute; Please join our discussion forum [here] (http://groups.google.com/d/forum/usc-cloud)
+
+
 Future enhancements
 -------------------
 
